@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>התחבר למערכת</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        /* CSS Variables for Dark Mode */
+        :root {
+            --bg-color: #1a1a2e;
+            --sidebar-bg: #16213e; /* לא בשימוש ב login.html אבל שומר על עקביות */
+            --card-bg: #0f3460;
+            --text-color: #e0e0e0;
+            --secondary-text-color: #a0a0a0;
+            --accent-color: #e94560;
+            --border-color: #0f3460;
+            --input-bg: #16213e;
+            --button-bg: #e94560;
+            --button-hover-bg: #c93450;
+            --form-bg: #16213e;
+        }
+
+        /* Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Login Container Styles */
+        .login-container {
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            width: 400px;
+            max-width: 90%;
+        }
+
+        .login-container h2 {
+            margin-bottom: 30px;
+            color: var(--accent-color);
+        }
+
+        .login-form .form-group {
+            margin-bottom: 20px;
+            text-align: right; /* RTL */
+        }
+
+        .login-form label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--secondary-text-color);
+        }
+
+        .login-form input[type="text"],
+        .login-form input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            font-size: 16px;
+            direction: rtl; /* For Hebrew input */
+            text-align: right;
+        }
+
+        .login-form input[type="text"]::placeholder,
+        .login-form input[type="password"]::placeholder {
+            color: var(--secondary-text-color);
+        }
+
+        .login-form button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: var(--button-bg);
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            direction: rtl;
+        }
+
+        .login-form button:hover {
+            background-color: var(--button-hover-bg);
+        }
+
+        .login-error {
+            color: var(--accent-color);
+            margin-top: 15px;
+            font-weight: bold;
+            display: none; /* Hidden by default */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-container" id="login-container">
+        <h2>התחבר למערכת</h2>
+        <form class="login-form">
+            <div class="form-group">
+                <label for="username">שם השוטר:</label>
+                <input type="text" id="username" placeholder="הכנס שם משתמש" required>
+            </div>
+            <div class="form-group">
+                <label for="password">סיסמה:</label>
+                <input type="password" id="password" placeholder="הכנס סיסמה" required>
+            </div>
+            <button type="submit" id="login-btn">התחבר</button>
+            <p class="login-error" id="login-error">שם משתמש או סיסמה שגויים.</p>
+        </form>
+    </div>
+
+    <script>
+        const USERNAME = "שוטר";
+        const PASSWORD = "Policeilstate121";
+        const REDIRECT_URL = "index.html"; // The main system file
+
+        const loginBtn = document.getElementById('login-btn');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginError = document.getElementById('login-error');
+
+        loginBtn.addEventListener('click', (event) => {
+            event.preventDefault(); // Prevent form submission
+            const enteredUsername = usernameInput.value.trim();
+            const enteredPassword = passwordInput.value.trim();
+
+            if (enteredUsername === USERNAME && enteredPassword === PASSWORD) {
+                // Store a flag in localStorage to indicate successful login
+                // This is a simple mechanism; for real systems, use tokens.
+                localStorage.setItem('loggedIn', 'true');
+                localStorage.setItem('loggedInUser', enteredUsername); // Store username if needed
+                window.location.href = REDIRECT_URL; // Redirect to the main system
+            } else {
+                loginError.style.display = 'block';
+                usernameInput.value = ''; // Clear inputs on failure
+                passwordInput.value = '';
+                usernameInput.focus(); // Focus on username for retry
+            }
+        });
+
+        // Optional: If the user tries to access index.html directly without logging in
+        // (This check should ideally be on index.html)
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('loggedIn') === 'true') {
+                // If already logged in, redirect directly to the main system
+                window.location.href = REDIRECT_URL;
+            }
+        });
+    </script>
+</body>
+</html>
