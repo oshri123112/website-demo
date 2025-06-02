@@ -4,12 +4,15 @@
   <meta charset="UTF-8" />
   <title>מערכת משטרתית</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="style.css">
+  <script src="https://kit.fontawesome.com/a2e0fc2a5b.js" crossorigin="anonymous"></script>
   <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
     body {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: #0f0f0f;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
       color: white;
       display: flex;
       justify-content: center;
@@ -17,120 +20,111 @@
       height: 100vh;
       direction: rtl;
     }
-
-    .hidden { display: none; }
-
-    .container {
-      background: #1c1c1c;
+    .tablet {
+      background: #0c0c0c;
+      border: 6px solid #2dd4bf;
+      border-radius: 30px;
+      width: 360px;
       padding: 30px;
-      border-radius: 20px;
-      box-shadow: 0 0 20px #00c0ff44;
-      width: 90%;
-      max-width: 400px;
+      box-shadow: 0 0 25px #2dd4bf88;
       text-align: center;
+      transition: all 0.3s ease;
     }
-
+    .hidden { display: none; }
     h2 {
-      color: #00c0ff;
+      color: #2dd4bf;
+      margin-bottom: 20px;
     }
-
-    button, input, select {
-      margin-top: 10px;
-      width: 90%;
+    input, button {
+      width: 100%;
       padding: 12px;
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
+      margin: 10px 0;
       font-size: 16px;
     }
-
     button {
-      background-color: #007BFF;
-      color: white;
+      background-color: #2dd4bf;
+      color: black;
+      font-weight: bold;
       cursor: pointer;
       transition: 0.3s;
     }
-
     button:hover {
-      background-color: #0056b3;
+      background-color: #1ab0a2;
     }
-
-    .tablet {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      margin-top: 20px;
-    }
-
-    .tablet button {
+    .btn-icon {
       display: flex;
       align-items: center;
       justify-content: right;
       gap: 10px;
     }
-
-    .message {
-      background: #222;
+    .btn-icon i {
+      font-size: 18px;
+    }
+    .section {
+      margin-top: 20px;
+    }
+    #messageBox {
+      background: #1e293b;
       padding: 10px;
       border-radius: 10px;
       margin-top: 10px;
+      font-size: 14px;
+    }
+    #reportForm input {
+      background: #1e293b;
+      color: white;
     }
   </style>
 </head>
 <body>
 
-  <!-- מסך ראשי -->
-  <div class="container" id="mainMenu">
+  <div class="tablet" id="mainMenu">
     <h2>ברוך הבא</h2>
-    <p>בחר מערכת:</p>
-    <button onclick="showPoliceLogin()">👮 מערכת המשטרה</button>
-    <button onclick="showTeamLogin()">🛡️ מערכת הצוות</button>
+    <button onclick="showPoliceLogin()">👮 כניסה למערכת המשטרה</button>
+    <button onclick="showTeamLogin()">🛡️ כניסה למערכת הצוות</button>
   </div>
 
-  <!-- התחברות למשטרה -->
-  <div class="container hidden" id="policeLogin">
-    <h2>כניסה למשטרה</h2>
-    <input id="policeName" placeholder="שם מלא">
-    <input type="password" id="policePass" placeholder="סיסמה">
+  <div class="tablet hidden" id="policeLogin">
+    <h2>התחברות - משטרה</h2>
+    <input id="policeName" placeholder="שם מלא" />
+    <input type="password" id="policePass" placeholder="סיסמה" />
     <button onclick="enterPolice()">התחבר</button>
   </div>
 
-  <!-- מערכת המשטרה -->
-  <div class="container hidden" id="policeSystem">
-    <h2>👮 מערכת המשטרה</h2>
+  <div class="tablet hidden" id="policeSystem">
+    <h2>👮 טאבלט משטרתי</h2>
 
-    <div class="tablet">
-      <button onclick="showReportForm()">📋 דיווח</button>
-      <button onclick="showMessage('רדיפה התחילה!')">🚓 רדיפה</button>
-      <button onclick="showMessage('גיבוי נשלח!')">🔊 גיבוי</button>
-      <button onclick="showMessage('בודק רישום...')">🧾 בדיקת רישום</button>
-      <button onclick="showMessage('בודק תעודה...')">🔍 בדיקת תעודה</button>
-      <button onclick="clearReportForm()">🗑️ ניקוי טופס</button>
+    <div class="section">
+      <button class="btn-icon" onclick="showReportForm()"><i class="fas fa-clipboard-list"></i> טופס דיווח</button>
+      <button class="btn-icon" onclick="showMessage('🚓 רדיפה התחילה!')"><i class="fas fa-car-crash"></i> רדיפה</button>
+      <button class="btn-icon" onclick="showMessage('🔊 גיבוי בדרך!')"><i class="fas fa-headset"></i> גיבוי</button>
+      <button class="btn-icon" onclick="showMessage('🧾 בודק רישום...')"><i class="fas fa-id-card"></i> בדיקת רישום</button>
+      <button class="btn-icon" onclick="showMessage('🔍 בודק תעודה...')"><i class="fas fa-search"></i> בדיקת תעודה</button>
+      <button class="btn-icon" onclick="clearReportForm()"><i class="fas fa-eraser"></i> ניקוי טופס</button>
     </div>
 
-    <!-- טופס דיווח -->
-    <div id="reportForm" class="hidden">
-      <h3>📝 טופס דיווח</h3>
-      <input id="reportName" placeholder="שם העצור">
-      <input id="reportID" placeholder="תעודת זהות">
-      <input id="reportCrime" placeholder="סיבת מעצר">
-      <input id="reportOfficer" placeholder="שם שוטר">
+    <div id="reportForm" class="hidden section">
+      <input id="reportName" placeholder="שם העצור" />
+      <input id="reportID" placeholder="תעודת זהות" />
+      <input id="reportCrime" placeholder="סיבת מעצר" />
+      <input id="reportOfficer" placeholder="שם שוטר" />
       <button onclick="submitReport()">שלח דיווח</button>
     </div>
 
-    <div class="message" id="messageBox">ברוך הבא!</div>
+    <div id="messageBox">מחובר למערכת</div>
   </div>
 
-  <!-- התחברות לצוות -->
-  <div class="container hidden" id="teamLogin">
-    <h2>מערכת הצוות</h2>
-    <input type="password" id="teamPass" placeholder="סיסמה">
+  <div class="tablet hidden" id="teamLogin">
+    <h2>התחברות - צוות</h2>
+    <input type="password" id="teamPass" placeholder="סיסמה" />
     <button onclick="enterTeam()">כניסה</button>
   </div>
 
-  <!-- מערכת הצוות -->
-  <div class="container hidden" id="teamSystem">
+  <div class="tablet hidden" id="teamSystem">
     <h2>🛡️ מערכת הצוות</h2>
-    <p>כאן תופיע מערכת ניהול לצוות (בהמשך)</p>
+    <p>כאן תתווסף מערכת ניהול בעתיד</p>
   </div>
 
   <script src="main.js"></script>
