@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מערכת FiveM - חיובים</title>
+    <title>מערכת משטרתית - ISRP</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* איפוס CSS בסיסי */
         * {
@@ -15,577 +15,309 @@
         }
 
         body {
-            font-family: 'Roboto', sans-serif; /* גופן כללי, ניתן לשנות */
-            background-color: #1a1a1a; /* צבע רקע כללי כהה מאוד */
+            font-family: 'Inter', sans-serif; /* גופן כללי, דומה למה שראיתי בתמונות */
+            background-color: #2e2e2e; /* רקע כהה מאוד */
             color: #e0e0e0; /* צבע טקסט כללי בהיר */
             direction: rtl; /* כיוון כתיבה מימין לשמאל */
-            font-size: 14px;
-        }
-
-        .app-container {
-            display: flex;
-            height: 100vh; /* גובה מלא של המסך */
-            overflow: hidden; /* למנוע גלילה על ה-app-container */
-        }
-
-        /* סרגל צדדי (Sidebar) */
-        .sidebar {
-            width: 250px; /* רוחב קבוע של הסרגל */
-            background-color: #212121; /* צבע רקע כהה יותר מהרקע הכללי */
-            padding: 20px 0;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-            overflow-y: auto; /* מאפשר גלילה אם התוכן ארוך מדי */
-            flex-shrink: 0; /* מונע מהסרגל להתכווץ */
-        }
-
-        .sidebar-header {
-            display: flex;
-            align-items: center;
-            padding: 0 20px 20px;
-            border-bottom: 1px solid #333; /* קו הפרדה עדין */
-            margin-bottom: 20px;
-        }
-
-        .sidebar-header .logo {
-            width: 60px;
-            height: 60px;
-            border-radius: 8px; /* פינות מעוגלות ללוגו */
-            margin-left: 15px; /* מרווח מצד ימין (כי זה RTL) */
-            object-fit: cover;
-        }
-
-        .sidebar-header .app-name {
-            font-size: 1.2em;
-            font-weight: 500;
-            color: #f0f0f0;
-        }
-
-        .sidebar-nav ul {
-            list-style: none;
-        }
-
-        .sidebar-nav ul li {
-            margin-bottom: 5px;
-        }
-
-        .sidebar-nav .nav-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 20px;
-            color: #a0a0a0; /* צבע טקסט של פריטי התפריט לא פעילים */
-            text-decoration: none;
-            transition: background-color 0.2s, color 0.2s;
-            border-radius: 5px; /* פינות מעוגלות לפריטים */
-            margin: 0 10px; /* מרווח מהצדדים */
-        }
-
-        .sidebar-nav .nav-item i {
-            margin-left: 15px; /* מרווח ימני לאייקון (בגלל RTL) */
-            font-size: 1.1em;
-        }
-
-        .sidebar-nav .nav-item:hover {
-            background-color: #333; /* רקע בהצבעה */
-            color: #fff;
-        }
-
-        .sidebar-nav .nav-item.active {
-            background-color: #4CAF50; /* צבע הדגשה ירוק לפריט פעיל */
-            color: #fff;
-            font-weight: 500;
-        }
-
-        .sidebar-nav .nav-item.bottom-item {
-            border-top: 1px solid #333;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-radius: 0;
-        }
-
-        /* תוכן ראשי (Main Content) */
-        .main-content {
-            flex-grow: 1; /* יתפוס את כל השטח הנותר */
-            background-color: #1a1a1a; /* רקע של התוכן הראשי - זהה ל-body */
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            overflow-y: auto; /* מאפשר גלילה בתוך התוכן הראשי */
-        }
-
-        .main-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #333;
-        }
-
-        .main-header .page-title {
-            font-size: 1.8em;
-            color: #f0f0f0;
-            font-weight: 600;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 15px; /* מרווח בין האלמנטים */
-        }
-
-        .search-input {
-            background-color: #333;
-            border: 1px solid #444;
-            border-radius: 5px;
-            padding: 8px 12px;
-            color: #e0e0e0;
-            font-size: 1em;
-            width: 200px;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        .search-input::placeholder {
-            color: #888;
-        }
-
-        .search-input:focus {
-            border-color: #4CAF50;
-            box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
-            outline: none;
-        }
-
-        .button {
-            background-color: #007bff; /* כחול בסיסי לכפתורים */
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px; /* מרווח בין אייקון לטקסט */
-        }
-
-        .button:hover {
-            background-color: #0056b3;
-        }
-
-        /* צבעים ספציפיים שראיתי בתמונות */
-        .button.green {
-            background-color: #4CAF50;
-        }
-        .button.green:hover {
-            background-color: #45a049;
-        }
-        .button.red {
-            background-color: #f44336;
-        }
-        .button.red:hover {
-            background-color: #da190b;
-        }
-        .button.purple {
-            background-color: #9c27b0;
-        }
-        .button.purple:hover {
-            background-color: #7b1fa2;
-        }
-        .button.orange {
-            background-color: #ff9800;
-        }
-        .button.orange:hover {
-            background-color: #e68900;
+            font-size: 15px;
+            line-height: 1.6;
+            height: 100vh;
+            display: flex; /* כדי שהאפליקציה תתפרס על כל הגובה */
+            overflow: hidden; /* מונע גלילה מיותרת ב-body */
         }
 
         /* Scrollbar (לעיצוב סקרוואל כמו בתמונות) */
         ::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
+            width: 8px;
+            height: 8px;
         }
 
         ::-webkit-scrollbar-track {
-            background: #2a2a2a;
-            border-radius: 5px;
+            background: #3a3a3a; /* צבע רקע של המסלול */
+            border-radius: 4px;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: #555;
-            border-radius: 5px;
+            background: #555; /* צבע ידית הסקרוואל */
+            border-radius: 4px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: #666;
+            background: #666; /* צבע ידית הסקרוואל במעבר עכבר */
         }
 
         /* לכל הדפדפנים */
         * {
             scrollbar-width: thin;
-            scrollbar-color: #555 #2a2a2a;
+            scrollbar-color: #555 #3a3a3a;
         }
 
-        /* רכיבים ספציפיים לדף "חיובים" */
-        .content-area {
-            background-color: #2a2a2a; /* רקע לאזורי תוכן ספציפיים, בהיר במעט מהרקע הכללי */
-            border-radius: 8px; /* פינות מעוגלות לאזור התוכן */
-            padding: 20px;
-            flex-grow: 1; /* יתפוס את השטח שנותר ב-main-content */
+        /* מבנה האפליקציה הכללי */
+        .app-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            background-color: #222222; /* רקע כללי של האפליקציה */
+            border-radius: 10px; /* פינות מעוגלות לאפליקציה כולה */
+            overflow: hidden; /* לוודא שהפינות המעוגלות עובדות */
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4); /* צל עדין לאפליקציה */
+        }
+
+        /* סרגל צדדי שמאלי (Side Nav) */
+        .side-nav {
+            width: 60px; /* רוחב צר מאוד */
+            background-color: #1c1c1c; /* כהה יותר מהרקע הכללי */
             display: flex;
             flex-direction: column;
+            align-items: center;
+            padding: 15px 0;
+            flex-shrink: 0; /* מונע התכווצות */
+            border-left: 1px solid #333; /* קו הפרדה עדין מימין, בגלל RTL */
         }
 
-        .table-controls {
+        .side-nav-header {
+            margin-bottom: 30px;
+        }
+
+        .side-nav-header .mini-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .side-nav-menu ul {
+            list-style: none;
+        }
+
+        .side-nav-menu li {
+            margin-bottom: 15px;
+        }
+
+        .side-nav-menu .nav-icon {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap; /* מאפשר גלישה בשורה הבאה במסכים קטנים */
+            width: 45px;
+            height: 45px;
+            color: #a0a0a0;
+            font-size: 1.3em;
+            text-decoration: none;
+            border-radius: 8px; /* פינות מעוגלות לאייקונים */
+            transition: background-color 0.2s, color 0.2s;
+            position: relative; /* עבור ה-tooltip */
+        }
+
+        .side-nav-menu .nav-icon:hover {
+            background-color: #333;
+            color: #fff;
+        }
+
+        .side-nav-menu .nav-icon.active {
+            background-color: #4CAF50; /* צבע הדגשה ירוק */
+            color: #fff;
+        }
+
+        /* Tooltip לסרגל צד (כשמרחפים עם העכבר) */
+        .nav-icon::before {
+            content: attr(title); /* הטקסט של ה-tooltip הוא מה-title attribute */
+            position: absolute;
+            right: 60px; /* מיקום לימין האייקון */
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            z-index: 100;
+        }
+
+        .nav-icon:hover::before {
+            opacity: 1;
+        }
+
+        .side-nav-footer {
+            margin-top: auto; /* דוחף את הפוטר לתחתית */
+            display: flex;
+            flex-direction: column;
             gap: 15px;
         }
 
-        .table-filters {
+        /* אזור ראשי (Main Area) */
+        .main-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #222222; /* רקע של אזור התוכן הראשי */
+        }
+
+        /* סרגל עליון (Top Bar) */
+        .top-bar {
+            background-color: #2e2e2e; /* כהה יותר מהרקע הראשי */
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #3a3a3a; /* קו הפרדה תחתון */
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            flex-shrink: 0; /* מונע התכווצות */
+        }
+
+        .top-bar-left .current-page-title {
+            font-size: 1.6em;
+            font-weight: 600;
+            color: #f0f0f0;
+        }
+
+        .top-bar-right {
             display: flex;
             gap: 10px;
-            flex-wrap: wrap;
         }
 
-        .filter-select {
-            background-color: #333;
-            border: 1px solid #444;
-            border-radius: 5px;
-            padding: 8px 12px;
-            color: #e0e0e0;
-            font-size: 1em;
-            outline: none;
-            cursor: pointer;
-        }
-
-        .filter-select option {
-            background-color: #333;
-            color: #e0e0e0;
-        }
-
-        .data-table-container {
-            overflow-x: auto; /* מאפשר גלילה אופקית לטבלה אם היא רחבה מדי */
-            border-radius: 8px;
-            background-color: #212121; /* רקע לטבלה עצמה */
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            flex-grow: 1; /* שהטבלה תתפוס את השטח שנותר */
-        }
-
-        .data-table {
-            width: 100%;
-            border-collapse: collapse; /* הסרת רווחים בין תאי טבלה */
-            min-width: 900px; /* רוחב מינימלי לטבלה כדי למנוע דחיסה */
-        }
-
-        .data-table th,
-        .data-table td {
-            padding: 12px 15px;
-            text-align: right; /* יישור לימין בגלל RTL */
-            border-bottom: 1px solid #333;
-            font-size: 0.95em;
-        }
-
-        .data-table th {
-            background-color: #333; /* רקע לכותרות עמודות */
+        .top-bar-button {
+            background-color: #3a3a3a; /* רקע כפתור כללי */
             color: #f0f0f0;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        .data-table tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        .data-table tbody tr:hover {
-            background-color: #2b2b2b; /* רקע בהצבעה על שורה */
-        }
-
-        .data-table td .status-badge {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-weight: 500;
-            font-size: 0.85em;
-            text-align: center;
-        }
-
-        .status-badge.pending {
-            background-color: #ff980040; /* כתום שקוף */
-            color: #ff9800;
-        }
-        .status-badge.approved {
-            background-color: #4CAF5040; /* ירוק שקוף */
-            color: #4CAF50;
-        }
-        .status-badge.rejected {
-            background-color: #f4433640; /* אדום שקוף */
-            color: #f44336;
-        }
-        .status-badge.completed {
-            background-color: #007bff40; /* כחול שקוף */
-            color: #007bff;
-        }
-        .status-badge.active {
-            background-color: #9c27b040; /* סגול שקוף */
-            color: #9c27b0;
-        }
-
-        .action-buttons {
+            border: none;
+            border-radius: 8px; /* פינות מעוגלות לכפתורים */
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.2s, transform 0.2s;
             display: flex;
-            gap: 5px;
-            justify-content: flex-end; /* יישור כפתורי פעולה לימין בתא */
+            align-items: center;
+            justify-content: center;
         }
 
-        .action-buttons .button {
-            padding: 8px 10px;
-            font-size: 0.85em;
-            border-radius: 4px;
+        .top-bar-button i {
+            font-size: 1em;
+        }
+
+        .top-bar-button:hover {
+            background-color: #4a4a4a;
+            transform: translateY(-2px);
+        }
+
+        .top-bar-button.green {
+            background-color: #4CAF50;
+        }
+        .top-bar-button.green:hover {
+            background-color: #45a049;
+        }
+        .top-bar-button.purple {
+            background-color: #9c27b0;
+        }
+        .top-bar-button.purple:hover {
+            background-color: #7b1fa2;
+        }
+
+        /* תוכן הדף המרכזי (Page Content) */
+        .page-content {
+            flex-grow: 1;
+            padding: 25px;
+            overflow-y: auto; /* מאפשר גלילה בתוך תוכן הדף */
+        }
+
+        /* עיצוב לדאשבורד (כמו בתמונה הראשונה) */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* 2-3 עמודות, רספונסיבי */
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .dashboard-card {
+            background-color: #2a2a2a; /* כהה יותר מהרקע הכללי */
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .dashboard-card .icon-large {
+            font-size: 3.5em;
+            color: #4CAF50; /* צבע הדגשה לאייקונים */
+            margin-bottom: 15px;
+        }
+
+        .dashboard-card h3 {
+            font-size: 1.8em;
+            color: #f0f0f0;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .dashboard-card p {
+            color: #b0b0b0;
+            font-size: 1.1em;
         }
     </style>
 </head>
 <body>
     <div class="app-container">
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <img src="https://via.placeholder.com/60/4CAF50/FFFFFF" alt="לוגו" class="logo">
-                <span class="app-name">מערכת FiveM</span>
+        <aside class="side-nav">
+            <div class="side-nav-header">
+                <img src="https://via.placeholder.com/40/222222/AAAAAA?text=L" alt="לוגו" class="mini-logo">
             </div>
-            <nav class="sidebar-nav">
+            <nav class="side-nav-menu">
                 <ul>
-                    <li><a href="#" class="nav-item"><i class="fas fa-tachometer-alt"></i><span>דאשבורד</span></a></li>
-                    <li><a href="#" class="nav-item"><i class="fas fa-users"></i><span>אזרחים</span></a></li>
-                    <li><a href="#" class="nav-item"><i class="fas fa-exclamation-triangle"></i><span>אירועים</span></a></li>
-                    <li><a href="#" class="nav-item"><i class="fas fa-file-alt"></i><span>דוחות</span></a></li>
-                    <li><a href="#" class="nav-item"><i class="fas fa-bell"></i><span>התראות וצווי מעצר</span></a></li>
-                    <li><a href="#" class="nav-item"><i class="fas fa-car"></i><span>רכבים</span></a></li>
-                    <li><a href="#" class="nav-item"><i class="fas fa-balance-scale"></i><span>ראיות</span></a></li>
-                    <li><a href="#" class="nav-item"><i class="fas fa-camera"></i><span>מצלמות</span></a></li>
-                    <li><a href="#" class="nav-item"><i class="fas fa-gun"></i><span>רישום נשק</span></a></li>
-                    <li><a href="#" class="nav-item"><i class="fas fa-scroll"></i><span>חקיקה</span></a></li>
-                    <li><a href="#" class="nav-item"><i class="fas fa-user-tie"></i><span>צוות</span></a></li>
-                    <li><a href="#" class="nav-item"><i class="fas fa-book"></i><span>נהלי עבודה (SOP)</span></a></li>
-                    <li><a href="#" class="nav-item"><i class="fas fa-clipboard-list"></i><span>רשימת תורנים (Roster)</span></a></li>
-                    <li><a href="#" class="nav-item"><i class="fas fa-graduation-cap"></i><span>דף אקדמיה</span></a></li>
-                    <li><a href="#" class="nav-item"><i class="fas fa-database"></i><span>מאגר נתונים משמעתי</span></a></li>
-                    <li><a href="#" class="nav-item"><i class="fas fa-code"></i><span>קודי ותפקודים (10 Codes & Commands)</span></a></li>
-                    <li><a href="#" class="nav-item active bottom-item"><i class="fas fa-receipt"></i><span>חיובים (Charges)</span></a></li>
-                </ul>
+                    <li><a href="#" class="nav-icon active" title="דאשבורד"><i class="fas fa-home"></i></a></li>
+                    <li><a href="#" class="nav-icon" title="אזרחים"><i class="fas fa-user-friends"></i></a></li>
+                    <li><a href="#" class="nav-icon" title="אירועים"><i class="fas fa-exclamation-triangle"></i></a></li>
+                    <li><a href="#" class="nav-icon" title="דוחות"><i class="fas fa-file-alt"></i></a></li>
+                    <li><a href="#" class="nav-icon" title="צווי מעצר"><i class="fas fa-gavel"></i></a></li>
+                    <li><a href="#" class="nav-icon" title="רכבים"><i class="fas fa-car"></i></a></li>
+                    <li><a href="#" class="nav-icon" title="ראיות"><i class="fas fa-balance-scale"></i></a></li>
+                    <li><a href="#" class="nav-icon" title="רישום נשק"><i class="fas fa-gun"></i></a></li>
+                    </ul>
             </nav>
+            <div class="side-nav-footer">
+                <a href="#" class="nav-icon" title="הגדרות"><i class="fas fa-cog"></i></a>
+                <a href="#" class="nav-icon" title="התנתק"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
         </aside>
 
-        <main class="main-content">
-            <header class="main-header">
-                <h1 class="page-title">חיובים</h1>
-                <div class="header-actions">
-                    <input type="search" placeholder="חיפוש חיובים..." class="search-input">
-                    <button class="button green"><i class="fas fa-plus"></i> הוסף חיוב חדש</button>
-                    <button class="button purple"><i class="fas fa-filter"></i> סינון מתקדם</button>
+        <div class="main-area">
+            <header class="top-bar">
+                <div class="top-bar-left">
+                    <span class="current-page-title">דאשבורד</span>
+                </div>
+                <div class="top-bar-right">
+                    <button class="top-bar-button"><i class="fas fa-plus"></i></button>
+                    <button class="top-bar-button"><i class="fas fa-redo"></i></button>
+                    <button class="top-bar-button"><i class="fas fa-save"></i></button>
+                    <button class="top-bar-button green"><i class="fas fa-bell"></i></button>
+                    <button class="top-bar-button purple"><i class="fas fa-user-circle"></i></button>
                 </div>
             </header>
-            <div class="content-area">
-                <div class="table-controls">
-                    <div class="table-filters">
-                        <select class="filter-select">
-                            <option value="">כל הסטטוסים</option>
-                            <option value="pending">ממתין</option>
-                            <option value="approved">מאושר</option>
-                            <option value="rejected">נדחה</option>
-                            <option value="completed">הושלם</option>
-                        </select>
-                        <select class="filter-select">
-                            <option value="">כל סוגי החיובים</option>
-                            <option value="traffic">תעבורה</option>
-                            <option value="felony">פשע חמור</option>
-                            <option value="misdemeanor">עבירה קלה</option>
-                        </select>
-                    </div>
-                    <div class="pagination-controls">
-                        </div>
-                </div>
 
-                <div class="data-table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>תאריך</th>
-                                <th>שם אזרח</th>
-                                <th>תעודת זהות</th>
-                                <th>תיאור חיוב</th>
-                                <th>קנס</th>
-                                <th>מאסר</th>
-                                <th>סטטוס</th>
-                                <th>פעולות</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>01/06/2025</td>
-                                <td>דניאל לוי</td>
-                                <td>123456789</td>
-                                <td>נהיגה רשלנית</td>
-                                <td>$500</td>
-                                <td>שבוע</td>
-                                <td><span class="status-badge pending">ממתין</span></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="button orange"><i class="fas fa-edit"></i></button>
-                                        <button class="button red"><i class="fas fa-trash-alt"></i></button>
-                                        <button class="button green"><i class="fas fa-check"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>30/05/2025</td>
-                                <td>שרה כהן</td>
-                                <td>987654321</td>
-                                <td>גניבת רכב</td>
-                                <td>$1500</td>
-                                <td>חודש</td>
-                                <td><span class="status-badge approved">מאושר</span></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="button orange"><i class="fas fa-edit"></i></button>
-                                        <button class="button red"><i class="fas fa-trash-alt"></i></button>
-                                        <button class="button green"><i class="fas fa-check"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>3</td>
-                                <td>28/05/2025</td>
-                                <td>איתי מזרחי</td>
-                                <td>456789123</td>
-                                <td>תקיפת שוטר</td>
-                                <td>$2000</td>
-                                <td>3 חודשים</td>
-                                <td><span class="status-badge rejected">נדחה</span></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="button orange"><i class="fas fa-edit"></i></button>
-                                        <button class="button red"><i class="fas fa-trash-alt"></i></button>
-                                        <button class="button green"><i class="fas fa-check"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>4</td>
-                                <td>25/05/2025</td>
-                                <td>נועה פרץ</td>
-                                <td>654321987</td>
-                                <td>החזקת סמים</td>
-                                <td>$1000</td>
-                                <td>שבועיים</td>
-                                <td><span class="status-badge completed">הושלם</span></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="button orange"><i class="fas fa-edit"></i></button>
-                                        <button class="button red"><i class="fas fa-trash-alt"></i></button>
-                                        <button class="button green"><i class="fas fa-check"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                             <tr>
-                                <td>5</td>
-                                <td>20/05/2025</td>
-                                <td>יוסי יצחק</td>
-                                <td>112233445</td>
-                                <td>שימוש בלתי חוקי בנשק</td>
-                                <td>$2500</td>
-                                <td>6 חודשים</td>
-                                <td><span class="status-badge active">בתהליך</span></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="button orange"><i class="fas fa-edit"></i></button>
-                                        <button class="button red"><i class="fas fa-trash-alt"></i></button>
-                                        <button class="button green"><i class="fas fa-check"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                             <tr>
-                                <td>6</td>
-                                <td>18/05/2025</td>
-                                <td>מיה לוי</td>
-                                <td>223344556</td>
-                                <td>התפרצות לבית</td>
-                                <td>$1800</td>
-                                <td>חודש וחצי</td>
-                                <td><span class="status-badge pending">ממתין</span></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="button orange"><i class="fas fa-edit"></i></button>
-                                        <button class="button red"><i class="fas fa-trash-alt"></i></button>
-                                        <button class="button green"><i class="fas fa-check"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                             <tr>
-                                <td>7</td>
-                                <td>15/05/2025</td>
-                                <td>רון גורן</td>
-                                <td>334455667</td>
-                                <td>עבירות תנועה חוזרות</td>
-                                <td>$750</td>
-                                <td>ללא</td>
-                                <td><span class="status-badge approved">מאושר</span></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="button orange"><i class="fas fa-edit"></i></button>
-                                        <button class="button red"><i class="fas fa-trash-alt"></i></button>
-                                        <button class="button green"><i class="fas fa-check"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                             <tr>
-                                <td>8</td>
-                                <td>12/05/2025</td>
-                                <td>אנה בירן</td>
-                                <td>445566778</td>
-                                <td>זיוף מסמכים</td>
-                                <td>$1200</td>
-                                <td>3 שבועות</td>
-                                <td><span class="status-badge rejected">נדחה</span></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <button class="button orange"><i class="fas fa-edit"></i></button>
-                                        <button class="button red"><i class="fas fa-trash-alt"></i></button>
-                                        <button class="button green"><i class="fas fa-check"></i></button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <div class="page-content">
+                <p>ברוך הבא למערכת המשטרתית החדשה!</p>
+                <p>התוכן של הדפים השונים יופיע כאן, מחולק לפאנלים.</p>
+                <div class="dashboard-grid">
+                    <div class="dashboard-card">
+                        <i class="fas fa-exclamation-circle icon-large"></i>
+                        <h3>התראות</h3>
+                        <p>עדכונים אחרונים על אירועים וצווי מעצר.</p>
+                    </div>
+                    <div class="dashboard-card">
+                        <i class="fas fa-history icon-large"></i>
+                        <h3>פעילויות אחרונות</h3>
+                        <p>היסטוריית הפעולות שבוצעו במערכת.</p>
+                    </div>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
-
-    <script>
-        // במידה ותרצה להוסיף פונקציונליות JS בהמשך, היא תמוקם כאן.
-        // לדוגמה, לוגיקה לסימון פריט בתפריט הצד:
-        document.addEventListener('DOMContentLoaded', function() {
-            const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
-            navItems.forEach(item => {
-                item.addEventListener('click', function(event) {
-                    navItems.forEach(i => i.classList.remove('active'));
-                    this.classList.add('active');
-                    // בפועל, כאן היית טוען תוכן לדף.
-                    // כרגע זה רק לצורך ויזואלי.
-                    event.preventDefault(); // מונע קפיצה של הדף למעלה
-                });
-            });
-        });
-    </script>
 </body>
 </html>
