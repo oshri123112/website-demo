@@ -126,7 +126,7 @@ logoutBtn.addEventListener('click', function() {
 navLinks.forEach(link => {
     link.addEventListener('click', function(e) {
         e.preventDefault();
-        const sectionId = this.dataset.section + '-section';
+        const sectionId = this.parentElement.dataset.section + '-section'; // Correctly get data-section from parent li
         const sectionTitle = this.textContent.trim(); // Get the text content of the link
 
         // Remove active class from all nav links
