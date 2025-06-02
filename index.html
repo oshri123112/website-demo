@@ -1,132 +1,301 @@
 <!DOCTYPE html>
 <html lang="he">
 <head>
-  <meta charset="UTF-8" />
-  <title>מערכת משטרתית</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="https://kit.fontawesome.com/a2e0fc2a5b.js" crossorigin="anonymous"></script>
-  <style>
-    * {
-      box-sizing: border-box;
-      font-family: 'Segoe UI', sans-serif;
-    }
-    body {
-      margin: 0;
-      background: linear-gradient(135deg, #0f172a, #1e293b);
-      color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      direction: rtl;
-    }
-    .tablet {
-      background: #0c0c0c;
-      border: 6px solid #2dd4bf;
-      border-radius: 30px;
-      width: 360px;
-      padding: 30px;
-      box-shadow: 0 0 25px #2dd4bf88;
-      text-align: center;
-      transition: all 0.3s ease;
-    }
-    .hidden { display: none; }
-    h2 {
-      color: #2dd4bf;
-      margin-bottom: 20px;
-    }
-    input, button {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 12px;
-      margin: 10px 0;
-      font-size: 16px;
-    }
-    button {
-      background-color: #2dd4bf;
-      color: black;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    button:hover {
-      background-color: #1ab0a2;
-    }
-    .btn-icon {
-      display: flex;
-      align-items: center;
-      justify-content: right;
-      gap: 10px;
-    }
-    .btn-icon i {
-      font-size: 18px;
-    }
-    .section {
-      margin-top: 20px;
-    }
-    #messageBox {
-      background: #1e293b;
-      padding: 10px;
-      border-radius: 10px;
-      margin-top: 10px;
-      font-size: 14px;
-    }
-    #reportForm input {
-      background: #1e293b;
-      color: white;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מערכת ניהול משטרתית</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css"> לודא שזה מחובר לקובץ הCSS שלך
 </head>
 <body>
 
-  <div class="tablet" id="mainMenu">
-    <h2>ברוך הבא</h2>
-    <button onclick="showPoliceLogin()">👮 כניסה למערכת המשטרה</button>
-    <button onclick="showTeamLogin()">🛡️ כניסה למערכת הצוות</button>
-  </div>
-
-  <div class="tablet hidden" id="policeLogin">
-    <h2>התחברות - משטרה</h2>
-    <input id="policeName" placeholder="שם מלא" />
-    <input type="password" id="policePass" placeholder="סיסמה" />
-    <button onclick="enterPolice()">התחבר</button>
-  </div>
-
-  <div class="tablet hidden" id="policeSystem">
-    <h2>👮 טאבלט משטרתי</h2>
-
-    <div class="section">
-      <button class="btn-icon" onclick="showReportForm()"><i class="fas fa-clipboard-list"></i> טופס דיווח</button>
-      <button class="btn-icon" onclick="showMessage('🚓 רדיפה התחילה!')"><i class="fas fa-car-crash"></i> רדיפה</button>
-      <button class="btn-icon" onclick="showMessage('🔊 גיבוי בדרך!')"><i class="fas fa-headset"></i> גיבוי</button>
-      <button class="btn-icon" onclick="showMessage('🧾 בודק רישום...')"><i class="fas fa-id-card"></i> בדיקת רישום</button>
-      <button class="btn-icon" onclick="showMessage('🔍 בודק תעודה...')"><i class="fas fa-search"></i> בדיקת תעודה</button>
-      <button class="btn-icon" onclick="clearReportForm()"><i class="fas fa-eraser"></i> ניקוי טופס</button>
+    <div id="login-container">
+        <div class="login-box">
+            <h2>התחברות למערכת</h2>
+            <form id="loginForm">
+                <div class="input-group">
+                    <label for="username">שם משתמש:</label>
+                    <input type="text" id="username" required>
+                </div>
+                <div class="input-group">
+                    <label for="password">סיסמה:</label>
+                    <input type="password" id="password" required>
+                </div>
+                <button type="submit">התחבר</button>
+                <p id="loginMessage" class="error-message hidden">שם משתמש או סיסמה שגויים.</p>
+            </form>
+        </div>
     </div>
 
-    <div id="reportForm" class="hidden section">
-      <input id="reportName" placeholder="שם העצור" />
-      <input id="reportID" placeholder="תעודת זהות" />
-      <input id="reportCrime" placeholder="סיבת מעצר" />
-      <input id="reportOfficer" placeholder="שם שוטר" />
-      <button onclick="submitReport()">שלח דיווח</button>
+    <div id="main-content" class="hidden">
+        <header class="main-header">
+            <h1 id="currentSectionTitle">מערכת ניהול</h1>
+            <button class="logout-button" id="logoutBtn" title="התנתק"><i class="fas fa-sign-out-alt"></i></button>
+        </header>
+
+        <nav class="sidebar">
+            <ul class="nav-links">
+                <li><a href="#" data-section="dashboard"><i class="fas fa-tachometer-alt"></i> לוח מחוונים</a></li>
+                <li><a href="#" data-section="reports"><i class="fas fa-file-alt"></i> דוחות</a></li>
+                <li><a href="#" data-section="bolosWarrants"><i class="fas fa-scroll"></i> צווי מעצר & Bolos</a></li>
+                <li><a href="#" data-section="vehicles"><i class="fas fa-car-alt"></i> כלי רכב</a></li>
+                <li><a href="#" data-section="evidence"><i class="fas fa-dna"></i> ראיות</a></li>
+                <li><a href="#" data-section="weaponRegistry"><i class="fas fa-gun"></i> רישום נשק</a></li>
+                <li><a href="#" data-section="staff"><i class="fas fa-users"></i> סגל</a></li>
+                <li><a href="#" data-section="roster"><i class="fas fa-clipboard-list"></i> רשימת סגל</a></li>
+                <li><a href="#" data-section="codesCommands"><i class="fas fa-terminal"></i> קודים & פקודות</a></li>
+                <li><a href="#" data-section="charges"><i class="fas fa-gavel"></i> אישומים</a></li>
+            </ul>
+        </nav>
+
+        <main class="content-area">
+            <section id="dashboard-section" class="content-section active">
+                <h2>לוח מחוונים</h2>
+                <p>ברוך הבא למערכת הניהול המשטרתית. בחר קטגוריה מהתפריט בצד.</p>
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <h3><i class="fas fa-exclamation-triangle"></i> צווי מעצר פעילים</h3>
+                        <p id="activeWarrantsCount">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3><i class="fas fa-car-crash"></i> רכבים רשומים</h3>
+                        <p id="registeredVehiclesCount">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3><i class="fas fa-file-invoice"></i> דוחות אחרונים</h3>
+                        <p id="recentReportsCount">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3><i class="fas fa-handcuffs"></i> אישומים זמינים</h3>
+                        <p id="availableChargesCount">0</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="reports-section" class="content-section hidden">
+                <h2>דוחות</h2>
+                <div class="section-actions">
+                    <button class="action-button" id="addReportBtn"><i class="fas fa-plus"></i> צור דוח חדש</button>
+                </div>
+                <div class="reports-container">
+                    <ul id="reportsList" class="reports-list">
+                        </ul>
+                    <div id="reportDetailPanel" class="report-detail-panel">
+                        <h3>בחר דוח לצפייה או צור דוח חדש</h3>
+                    </div>
+                </div>
+            </section>
+
+            <section id="bolosWarrants-section" class="content-section hidden">
+                <h2>צווי מעצר & Bolos</h2>
+                <div class="section-actions">
+                    <button class="action-button" id="addBoloWarrantBtn"><i class="fas fa-plus"></i> הוסף צו / Bolo</button>
+                </div>
+
+                <div id="boloFormContainer" class="form-container hidden">
+                    <h3>הוסף/ערוך צו מעצר / Bolo</h3>
+                    <form id="boloForm" class="data-form">
+                        <input type="hidden" id="boloId">
+                        <div class="form-group">
+                            <label for="boloType">סוג:</label>
+                            <select id="boloType" required>
+                                <option value="Bolo">Bolo</option>
+                                <option value="Warrant">צו מעצר</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="boloSubject">נושא (שם / רכב / אחר):</label>
+                            <input type="text" id="boloSubject" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="boloDescription">תיאור:</label>
+                            <textarea id="boloDescription" rows="4" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="boloIssuedBy">הונפק ע"י:</label>
+                            <input type="text" id="boloIssuedBy" required>
+                        </div>
+                        <div class="form-buttons">
+                            <button type="submit" class="action-button primary"><i class="fas fa-save"></i> שמור</button>
+                            <button type="button" class="action-button secondary" id="cancelBoloForm"><i class="fas fa-times"></i> ביטול</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="boloWarrantList" class="cards-grid">
+                    </div>
+            </section>
+
+            <section id="vehicles-section" class="content-section hidden">
+                <h2>כלי רכב</h2>
+                <div class="section-actions">
+                    <button class="action-button" id="addVehicleBtn"><i class="fas fa-plus"></i> הוסף רכב חדש</button>
+                </div>
+                <div id="vehicleGrid" class="cards-grid">
+                    </div>
+            </section>
+
+            <section id="evidence-section" class="content-section hidden">
+                <h2>ראיות</h2>
+                <div class="section-actions">
+                    <button class="action-button" id="addEvidenceBtn"><i class="fas fa-plus"></i> הוסף ראיה חדשה</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>פריט</th>
+                                <th>תיאור</th>
+                                <th>מספר קייס</th>
+                                <th>תאריך איסוף</th>
+                                <th>נאסף ע"י</th>
+                                <th>פעולות</th>
+                            </tr>
+                        </thead>
+                        <tbody id="evidenceTable">
+                            </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="weaponRegistry-section" class="content-section hidden">
+                <h2>רישום נשק</h2>
+                <div class="section-actions">
+                    <button class="action-button" id="addWeaponBtn"><i class="fas fa-plus"></i> רשום נשק חדש</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>דגם</th>
+                                <th>סוג</th>
+                                <th>מספר סידורי</th>
+                                <th>בעלים רשום</th>
+                                <th>סטטוס</th>
+                                <th>פעולות</th>
+                            </tr>
+                        </thead>
+                        <tbody id="weaponTable">
+                            </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="staff-section" class="content-section hidden">
+                <h2>סגל</h2>
+                <p>ניהול פרטי סגל.</p>
+                 <div class="section-actions">
+                    <button class="action-button" id="addStaffMemberBtn"><i class="fas fa-user-plus"></i> הוסף איש סגל</button>
+                </div>
+                <div id="staffGrid" class="cards-grid">
+                    </div>
+            </section>
+
+            <section id="roster-section" class="content-section hidden">
+                <h2>רשימת סגל</h2>
+                <p>צפייה ברשימת כל אנשי הסגל והסטטוס שלהם.</p>
+                <div class="section-actions">
+                    <button class="action-button" id="addRosterEntryBtn"><i class="fas fa-user-plus"></i> הוסף כניסה לרשימה</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>שם</th>
+                                <th>דרגה</th>
+                                <th>סטטוס</th>
+                                <th>פעולות</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rosterTable">
+                            </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="codesCommands-section" class="content-section hidden">
+                <h2>קודים & פקודות</h2>
+                <p>רשימת קודים ופקודות נפוצות.</p>
+                <div class="section-actions">
+                    <button class="action-button" id="addCodeCommandBtn"><i class="fas fa-plus"></i> הוסף קוד/פקודה</button>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>שם</th>
+                                <th>תיאור</th>
+                                <th>פעולות</th>
+                            </tr>
+                        </thead>
+                        <tbody id="codesCommandsTable">
+                            </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="charges-section" class="content-section hidden">
+                <h2>אישומים</h2>
+                <div class="section-actions">
+                    <button class="action-button" id="addChargeBtn"><i class="fas fa-plus"></i> הוסף אישום חדש</button>
+                </div>
+
+                <div id="chargeFormContainer" class="form-container hidden">
+                    <h3>הוסף/ערוך אישום</h3>
+                    <form id="chargeForm" class="data-form">
+                        <input type="hidden" id="chargeId">
+                        <div class="form-group">
+                            <label for="chargeTitle">כותרת אישום:</label>
+                            <input type="text" id="chargeTitle" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="chargeDescription">תיאור:</label>
+                            <textarea id="chargeDescription" rows="3"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="chargeFine">קנס ($):</label>
+                            <input type="number" id="chargeFine" min="0" value="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="chargeJail">מאסר (חודשים):</label>
+                            <input type="number" id="chargeJail" min="0" value="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="chargePoints">נקודות:</label>
+                            <input type="number" id="chargePoints" min="0" value="0" required>
+                        </div>
+                        <div class="form-buttons">
+                            <button type="submit" class="action-button primary"><i class="fas fa-save"></i> שמור אישום</button>
+                            <button type="button" class="action-button secondary" id="cancelChargeForm"><i class="fas fa-times"></i> ביטול</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>כותרת</th>
+                                <th>תיאור</th>
+                                <th>קנס</th>
+                                <th>מאסר</th>
+                                <th>נקודות</th>
+                                <th>פעולות</th>
+                            </tr>
+                        </thead>
+                        <tbody id="chargesTable">
+                            </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
     </div>
 
-    <div id="messageBox">מחובר למערכת</div>
-  </div>
-
-  <div class="tablet hidden" id="teamLogin">
-    <h2>התחברות - צוות</h2>
-    <input type="password" id="teamPass" placeholder="סיסמה" />
-    <button onclick="enterTeam()">כניסה</button>
-  </div>
-
-  <div class="tablet hidden" id="teamSystem">
-    <h2>🛡️ מערכת הצוות</h2>
-    <p>כאן תתווסף מערכת ניהול בעתיד</p>
-  </div>
-
-  <script src="main.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
