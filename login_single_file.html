@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>כניסה למערכת</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* איפוס CSS בסיסי */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%); /* רקע גרדיאנט כהה */
+            color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* גובה מסך מלא */
+            direction: rtl; /* כיוון כתיבה מימין לשמאל */
+            overflow: hidden; /* למנוע גלילה אם יש אפקטים */
+        }
+
+        /* אנימציית רקע (אופציונלי, למראה "מטורף" יותר) */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(76, 175, 80, 0.1) 0%, transparent 70%); /* עיגול ירוק עדין במרכז */
+            animation: pulse 10s infinite alternate; /* אנימציית פעימה */
+            z-index: -1; /* לוודא שהרקע מתחת לתוכן */
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(1.2);
+                opacity: 0.6;
+            }
+        }
+
+        .login-container {
+            perspective: 1000px; /* לאפקטים תלת מימדיים אם נרצה בעתיד */
+        }
+
+        .login-box {
+            background-color: #2a2a2a; /* רקע כהה לקופסת הלוגין */
+            padding: 40px;
+            border-radius: 15px; /* פינות מעוגלות מאוד */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), /* צל כהה ועמוק */
+                        0 0 0 2px rgba(76, 175, 80, 0.5); /* מסגרת ירוקה עדינה */
+            text-align: center;
+            width: 400px; /* רוחב קבוע לקופסה */
+            max-width: 90%; /* לוודא שהיא לא חורגת במסכים קטנים */
+            transition: transform 0.3s ease-in-out; /* אנימציה למעבר עכבר */
+        }
+
+        .login-box:hover {
+            transform: translateY(-5px) scale(1.01); /* אפקט קפיצה קלה במעבר עכבר */
+        }
+
+        .login-header {
+            margin-bottom: 30px;
+        }
+
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px; /* פינות מעוגלות ללוגו */
+            margin-bottom: 15px;
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.4); /* צל ירוק עדין ללוגו */
+        }
+
+        .login-header h1 {
+            font-size: 2.2em;
+            color: #4CAF50; /* כותרת ירוקה בולטת */
+            margin-bottom: 10px;
+            text-shadow: 0 0 5px rgba(76, 175, 80, 0.6); /* צל טקסט ירוק */
+        }
+
+        .login-header p {
+            color: #b0b0b0;
+            font-size: 1.1em;
+        }
+
+        .input-group {
+            text-align: right; /* יישור הטקסט של ה-label לימין */
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block; /* כל label בשורה נפרדת */
+            font-size: 1em;
+            color: #f0f0f0;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .input-group label i {
+            margin-left: 8px; /* מרווח בין האייקון לטקסט */
+            color: #4CAF50; /* אייקון ירוק */
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: #333; /* רקע שדה קלט כהה */
+            border: 1px solid #4CAF50; /* מסגרת ירוקה */
+            border-radius: 8px; /* פינות מעוגלות לשדה הקלט */
+            color: #fff;
+            font-size: 1em;
+            outline: none; /* הסרת מסגרת ברירת מחדל בפוקוס */
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: #66bb6a; /* מסגרת ירוקה בהירה יותר בפוקוס */
+            box-shadow: 0 0 10px rgba(76, 175, 80, 0.5); /* צל זוהר בפוקוס */
+        }
+
+        .input-group input::placeholder {
+            color: #888;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end; /* יישור לימין */
+            margin-bottom: 25px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            appearance: none; /* הסרת עיצוב ברירת מחדל */
+            width: 20px;
+            height: 20px;
+            background-color: #333;
+            border: 2px solid #4CAF50;
+            border-radius: 5px;
+            cursor: pointer;
+            position: relative;
+            margin-left: 10px; /* מרווח מהלייבל */
+            outline: none;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+
+        .checkbox-group input[type="checkbox"]:checked {
+            background-color: #4CAF50;
+            border-color: #4CAF50;
+        }
+
+        .checkbox-group input[type="checkbox"]:checked::after {
+            content: '\2713'; /* סימן V */
+            font-size: 14px;
+            color: #fff;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .checkbox-group label {
+            font-size: 0.95em;
+            color: #b0b0b0;
+            cursor: pointer;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 15px;
+            background-color: #4CAF50; /* כפתור ירוק בולט */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4); /* צל ירוק לכפתור */
+        }
+
+        .login-button:hover {
+            background-color: #45a049;
+            transform: translateY(-2px); /* אפקט קפיצה עדינה */
+        }
+
+        .login-button:active {
+            transform: translateY(0);
+        }
+
+        .login-footer {
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #888;
+        }
+
+        .login-footer a {
+            color: #007bff; /* כחול לקישורים */
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .login-footer a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .login-footer span {
+            margin: 0 10px;
+            color: #555;
+        }
+
+        /* אפקט גליץ' אופציונלי (למראה "מטורף" יותר) - קצת יותר מתקדם */
+        /* .login-header h1 {
+            animation: text-glitch 2s infinite alternate;
+        }
+
+        @keyframes text-glitch {
+            0% { transform: translate(0); text-shadow: 0 0 5px rgba(76, 175, 80, 0.6); }
+            20% { transform: translate(-2px, 2px); text-shadow: 2px -2px 5px rgba(76, 175, 80, 0.6); }
+            40% { transform: translate(1px, -1px); text-shadow: -1px 1px 5px rgba(76, 175, 80, 0.6); }
+            60% { transform: translate(-1px, 1px); text-shadow: 1px -1px 5px rgba(76, 175, 80, 0.6); }
+            80% { transform: translate(2px, -2px); text-shadow: -2px 2px 5px rgba(76, 175, 80, 0.6); }
+            100% { transform: translate(0); text-shadow: 0 0 5px rgba(76, 175, 80, 0.6); }
+        } */
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <img src="https://via.placeholder.com/80" alt="לוגו המערכת" class="login-logo">
+                <h1>כניסה למערכת</h1>
+                <p>אנא הזן/הזיני את פרטי ההתחברות שלך.</p>
+            </div>
+            <form class="login-form">
+                <div class="input-group">
+                    <label for="username"><i class="fas fa-user"></i> שם משתמש</label>
+                    <input type="text" id="username" placeholder="הכנס שם משתמש" required>
+                </div>
+                <div class="input-group">
+                    <label for="password"><i class="fas fa-lock"></i> סיסמה</label>
+                    <input type="password" id="password" placeholder="הכנס סיסמה" required>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" id="rememberMe">
+                    <label for="rememberMe">זכור אותי</label>
+                </div>
+                <button type="submit" class="login-button">התחבר/י</button>
+            </form>
+            <div class="login-footer">
+                <a href="#">שכחת סיסמה?</a>
+                <span>|</span>
+                <a href="#">צור חשבון חדש</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
