@@ -1,1222 +1,590 @@
 <!DOCTYPE html>
-<html lang="he">
+<html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מערכת ניהול - מלאה</title>
+    <title>מערכת FiveM - חיובים</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* CSS Variables for Dark Mode */
-        :root {
-            --bg-color: #1a1a2e;
-            --sidebar-bg: #16213e;
-            --card-bg: #0f3460;
-            --text-color: #e0e0e0;
-            --secondary-text-color: #a0a0a0;
-            --accent-color: #e94560;
-            --border-color: #0f3460;
-            --input-bg: #16213e;
-            --button-bg: #e94560;
-            --button-hover-bg: #c93450;
-            --form-bg: #16213e; /* רקע טופס */
-        }
-
-        /* Base Styles */
+        /* איפוס CSS בסיסי */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            /* overflow: hidden; Removed as login is separate */
+            font-family: 'Roboto', sans-serif; /* גופן כללי, ניתן לשנות */
+            background-color: #1a1a1a; /* צבע רקע כללי כהה מאוד */
+            color: #e0e0e0; /* צבע טקסט כללי בהיר */
+            direction: rtl; /* כיוון כתיבה מימין לשמאל */
+            font-size: 14px;
         }
 
-        /* Main Container Styles */
-        .main-container {
-            width: 100%;
-            height: 100vh;
+        .app-container {
             display: flex;
-            flex-direction: row-reverse; /* RTL layout */
+            height: 100vh; /* גובה מלא של המסך */
+            overflow: hidden; /* למנוע גלילה על ה-app-container */
         }
 
+        /* סרגל צדדי (Sidebar) */
         .sidebar {
-            width: 250px;
-            background-color: var(--sidebar-bg);
-            padding: 20px;
+            width: 250px; /* רוחב קבוע של הסרגל */
+            background-color: #212121; /* צבע רקע כהה יותר מהרקע הכללי */
+            padding: 20px 0;
             display: flex;
             flex-direction: column;
-            align-items: flex-end; /* Align sidebar items to the right */
-            border-left: 1px solid var(--border-color); /* Add border for separation */
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            overflow-y: auto; /* מאפשר גלילה אם התוכן ארוך מדי */
+            flex-shrink: 0; /* מונע מהסרגל להתכווץ */
         }
 
-        .sidebar .logo {
-            margin-bottom: 40px;
-            text-align: right; /* Align logo to the right */
-            font-size: 28px;
-            font-weight: bold;
-            color: var(--accent-color);
+        .sidebar-header {
             display: flex;
             align-items: center;
-            gap: 10px;
-            direction: rtl;
+            padding: 0 20px 20px;
+            border-bottom: 1px solid #333; /* קו הפרדה עדין */
+            margin-bottom: 20px;
         }
 
-        .sidebar .logo i {
-            font-size: 32px;
+        .sidebar-header .logo {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px; /* פינות מעוגלות ללוגו */
+            margin-left: 15px; /* מרווח מצד ימין (כי זה RTL) */
+            object-fit: cover;
         }
 
-        .sidebar-nav {
+        .sidebar-header .app-name {
+            font-size: 1.2em;
+            font-weight: 500;
+            color: #f0f0f0;
+        }
+
+        .sidebar-nav ul {
             list-style: none;
-            width: 100%;
         }
 
-        .sidebar-nav li {
-            margin-bottom: 15px;
+        .sidebar-nav ul li {
+            margin-bottom: 5px;
         }
 
-        .sidebar-nav li a {
+        .sidebar-nav .nav-item {
             display: flex;
             align-items: center;
-            justify-content: flex-end; /* Align text and icon to the right */
-            color: var(--text-color);
+            padding: 12px 20px;
+            color: #a0a0a0; /* צבע טקסט של פריטי התפריט לא פעילים */
             text-decoration: none;
-            padding: 12px 15px;
-            border-radius: 8px;
-            transition: background-color 0.3s ease, color 0.3s ease;
-            gap: 10px; /* Space between icon and text */
-            direction: rtl;
+            transition: background-color 0.2s, color 0.2s;
+            border-radius: 5px; /* פינות מעוגלות לפריטים */
+            margin: 0 10px; /* מרווח מהצדדים */
         }
 
-        .sidebar-nav li a:hover,
-        .sidebar-nav li.active a {
-            background-color: var(--accent-color);
-            color: white;
+        .sidebar-nav .nav-item i {
+            margin-left: 15px; /* מרווח ימני לאייקון (בגלל RTL) */
+            font-size: 1.1em;
         }
 
-        .sidebar-nav li a i {
-            font-size: 20px;
+        .sidebar-nav .nav-item:hover {
+            background-color: #333; /* רקע בהצבעה */
+            color: #fff;
         }
 
-        .content-area {
-            flex-grow: 1;
-            padding: 30px;
-            overflow-y: auto;
+        .sidebar-nav .nav-item.active {
+            background-color: #4CAF50; /* צבע הדגשה ירוק לפריט פעיל */
+            color: #fff;
+            font-weight: 500;
+        }
+
+        .sidebar-nav .nav-item.bottom-item {
+            border-top: 1px solid #333;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-radius: 0;
+        }
+
+        /* תוכן ראשי (Main Content) */
+        .main-content {
+            flex-grow: 1; /* יתפוס את כל השטח הנותר */
+            background-color: #1a1a1a; /* רקע של התוכן הראשי - זהה ל-body */
             display: flex;
             flex-direction: column;
+            padding: 20px;
+            overflow-y: auto; /* מאפשר גלילה בתוך התוכן הראשי */
         }
 
         .main-header {
-            background-color: var(--card-bg);
-            padding: 20px 30px;
-            border-radius: 10px;
-            margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            direction: rtl;
-        }
-
-        .main-header h1 {
-            font-size: 28px;
-            color: var(--accent-color);
-        }
-
-        .main-header .welcome-message {
-            font-size: 18px;
-            color: var(--secondary-text-color);
-        }
-
-        .section-content {
-            background-color: var(--card-bg);
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            flex-grow: 1;
-        }
-
-        .section-content h2 {
-            font-size: 24px;
             margin-bottom: 20px;
-            color: var(--text-color);
-            border-bottom: 2px solid var(--accent-color);
-            padding-bottom: 10px;
-            direction: rtl;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #333;
         }
 
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            direction: rtl;
+        .main-header .page-title {
+            font-size: 1.8em;
+            color: #f0f0f0;
+            font-weight: 600;
         }
 
-        .dashboard-card {
-            background-color: var(--form-bg);
-            padding: 25px;
-            border-radius: 8px;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease;
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px; /* מרווח בין האלמנטים */
         }
 
-        .dashboard-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .dashboard-card i {
-            font-size: 48px;
-            color: var(--accent-color);
-            margin-bottom: 15px;
-        }
-
-        .dashboard-card h3 {
-            font-size: 22px;
-            margin-bottom: 10px;
-            color: var(--text-color);
-        }
-
-        .dashboard-card p {
-            color: var(--secondary-text-color);
-            font-size: 16px;
-        }
-
-        /* Form Styles (General) */
-        .form-section .form-group {
-            margin-bottom: 20px;
-            direction: rtl;
-        }
-
-        .form-section label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: var(--secondary-text-color);
-        }
-
-        .form-section input[type="text"],
-        .form-section input[type="number"],
-        .form-section textarea,
-        .form-section select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border-color);
+        .search-input {
+            background-color: #333;
+            border: 1px solid #444;
             border-radius: 5px;
-            background-color: var(--input-bg);
-            color: var(--text-color);
-            font-size: 16px;
-            direction: rtl; /* For Hebrew input */
-            text-align: right;
+            padding: 8px 12px;
+            color: #e0e0e0;
+            font-size: 1em;
+            width: 200px;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
-        .form-section textarea {
-            resize: vertical;
-            min-height: 80px;
+        .search-input::placeholder {
+            color: #888;
         }
 
-        .form-section button {
-            padding: 12px 25px;
+        .search-input:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+            outline: none;
+        }
+
+        .button {
+            background-color: #007bff; /* כחול בסיסי לכפתורים */
+            color: white;
+            padding: 10px 15px;
             border: none;
             border-radius: 5px;
-            background-color: var(--button-bg);
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.3s ease;
-            direction: rtl;
+            font-size: 1em;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px; /* מרווח בין אייקון לטקסט */
         }
 
-        .form-section button:hover {
-            background-color: var(--button-hover-bg);
+        .button:hover {
+            background-color: #0056b3;
         }
 
-        /* Table Styles */
+        /* צבעים ספציפיים שראיתי בתמונות */
+        .button.green {
+            background-color: #4CAF50;
+        }
+        .button.green:hover {
+            background-color: #45a049;
+        }
+        .button.red {
+            background-color: #f44336;
+        }
+        .button.red:hover {
+            background-color: #da190b;
+        }
+        .button.purple {
+            background-color: #9c27b0;
+        }
+        .button.purple:hover {
+            background-color: #7b1fa2;
+        }
+        .button.orange {
+            background-color: #ff9800;
+        }
+        .button.orange:hover {
+            background-color: #e68900;
+        }
+
+        /* Scrollbar (לעיצוב סקרוואל כמו בתמונות) */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #2a2a2a;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #666;
+        }
+
+        /* לכל הדפדפנים */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: #555 #2a2a2a;
+        }
+
+        /* רכיבים ספציפיים לדף "חיובים" */
+        .content-area {
+            background-color: #2a2a2a; /* רקע לאזורי תוכן ספציפיים, בהיר במעט מהרקע הכללי */
+            border-radius: 8px; /* פינות מעוגלות לאזור התוכן */
+            padding: 20px;
+            flex-grow: 1; /* יתפוס את השטח שנותר ב-main-content */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap; /* מאפשר גלישה בשורה הבאה במסכים קטנים */
+            gap: 15px;
+        }
+
+        .table-filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            background-color: #333;
+            border: 1px solid #444;
+            border-radius: 5px;
+            padding: 8px 12px;
+            color: #e0e0e0;
+            font-size: 1em;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .filter-select option {
+            background-color: #333;
+            color: #e0e0e0;
+        }
+
+        .data-table-container {
+            overflow-x: auto; /* מאפשר גלילה אופקית לטבלה אם היא רחבה מדי */
+            border-radius: 8px;
+            background-color: #212121; /* רקע לטבלה עצמה */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            flex-grow: 1; /* שהטבלה תתפוס את השטח שנותר */
+        }
+
         .data-table {
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background-color: var(--input-bg);
-            border-radius: 8px;
-            overflow: hidden;
-            direction: rtl;
+            border-collapse: collapse; /* הסרת רווחים בין תאי טבלה */
+            min-width: 900px; /* רוחב מינימלי לטבלה כדי למנוע דחיסה */
         }
 
         .data-table th,
         .data-table td {
             padding: 12px 15px;
-            text-align: right; /* RTL */
-            border-bottom: 1px solid var(--border-color);
+            text-align: right; /* יישור לימין בגלל RTL */
+            border-bottom: 1px solid #333;
+            font-size: 0.95em;
         }
 
         .data-table th {
-            background-color: var(--accent-color);
-            color: white;
-            font-weight: bold;
+            background-color: #333; /* רקע לכותרות עמודות */
+            color: #f0f0f0;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
-        .data-table tr:nth-child(even) {
-            background-color: var(--card-bg);
+        .data-table tbody tr:last-child td {
+            border-bottom: none;
         }
 
-        .data-table tr:hover {
-            background-color: var(--form-bg);
+        .data-table tbody tr:hover {
+            background-color: #2b2b2b; /* רקע בהצבעה על שורה */
         }
 
-        .data-table .actions {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end; /* Align action buttons to the right */
-        }
-
-        .data-table .actions button {
-            padding: 8px 12px;
+        .data-table td .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
             border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background-color 0.3s ease;
+            font-weight: 500;
+            font-size: 0.85em;
+            text-align: center;
         }
 
-        .data-table .actions .edit-btn {
-            background-color: #4CAF50; /* Green */
-            color: white;
-            border: none;
+        .status-badge.pending {
+            background-color: #ff980040; /* כתום שקוף */
+            color: #ff9800;
+        }
+        .status-badge.approved {
+            background-color: #4CAF5040; /* ירוק שקוף */
+            color: #4CAF50;
+        }
+        .status-badge.rejected {
+            background-color: #f4433640; /* אדום שקוף */
+            color: #f44336;
+        }
+        .status-badge.completed {
+            background-color: #007bff40; /* כחול שקוף */
+            color: #007bff;
+        }
+        .status-badge.active {
+            background-color: #9c27b040; /* סגול שקוף */
+            color: #9c27b0;
         }
 
-        .data-table .actions .edit-btn:hover {
-            background-color: #45a049;
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+            justify-content: flex-end; /* יישור כפתורי פעולה לימין בתא */
         }
 
-        .data-table .actions .delete-btn {
-            background-color: #f44336; /* Red */
-            color: white;
-            border: none;
-        }
-
-        .data-table .actions .delete-btn:hover {
-            background-color: #da190b;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 80px;
-                padding: 10px;
-            }
-            .sidebar .logo {
-                font-size: 20px;
-                margin-bottom: 20px;
-                text-align: center;
-                justify-content: center;
-            }
-            .sidebar .logo span {
-                display: none; /* Hide text on small screens */
-            }
-            .sidebar-nav li a {
-                justify-content: center;
-                padding: 10px;
-            }
-            .sidebar-nav li a span {
-                display: none; /* Hide text on small screens */
-            }
-            .content-area {
-                padding: 15px;
-            }
-            .main-header {
-                flex-direction: column;
-                align-items: flex-end;
-                text-align: right;
-            }
-            .main-header h1 {
-                margin-bottom: 10px;
-            }
-            .dashboard-grid {
-                grid-template-columns: 1fr; /* Single column on small screens */
-            }
+        .action-buttons .button {
+            padding: 8px 10px;
+            font-size: 0.85em;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
-
-    <div class="main-container" id="main-container">
+    <div class="app-container">
         <aside class="sidebar">
-            <div class="logo"><i class="fas fa-shield-alt"></i> <span>מערכת משטרה</span></div>
-            <ul class="sidebar-nav">
-                <li class="active"><a href="#" data-section="dashboard"><i class="fas fa-tachometer-alt"></i> <span>לוח מחוונים</span></a></li>
-                <li><a href="#" data-section="reports"><i class="fas fa-file-alt"></i> <span>דוחות</span></a></li>
-                <li><a href="#" data-section="incidents"><i class="fas fa-exclamation-triangle"></i> <span>אירועים</span></a></li>
-                <li><a href="#" data-section="vehicles"><i class="fas fa-car"></i> <span>כלי רכב</span></a></li>
-                <li><a href="#" data-section="personnel"><i class="fas fa-users"></i> <span>כוח אדם</span></a></li>
-                <li><a href="#" data-section="codes-commands"><i class="fas fa-code"></i> <span>קודים ופקודות</span></a></li>
-                <li><a href="#" data-section="citizens"><i class="fas fa-address-book"></i> <span>אזרחים</span></a></li>
-            </ul>
+            <div class="sidebar-header">
+                <img src="https://via.placeholder.com/60/4CAF50/FFFFFF" alt="לוגו" class="logo">
+                <span class="app-name">מערכת FiveM</span>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="#" class="nav-item"><i class="fas fa-tachometer-alt"></i><span>דאשבורד</span></a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-users"></i><span>אזרחים</span></a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-exclamation-triangle"></i><span>אירועים</span></a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-file-alt"></i><span>דוחות</span></a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-bell"></i><span>התראות וצווי מעצר</span></a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-car"></i><span>רכבים</span></a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-balance-scale"></i><span>ראיות</span></a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-camera"></i><span>מצלמות</span></a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-gun"></i><span>רישום נשק</span></a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-scroll"></i><span>חקיקה</span></a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-user-tie"></i><span>צוות</span></a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-book"></i><span>נהלי עבודה (SOP)</span></a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-clipboard-list"></i><span>רשימת תורנים (Roster)</span></a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-graduation-cap"></i><span>דף אקדמיה</span></a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-database"></i><span>מאגר נתונים משמעתי</span></a></li>
+                    <li><a href="#" class="nav-item"><i class="fas fa-code"></i><span>קודי ותפקודים (10 Codes & Commands)</span></a></li>
+                    <li><a href="#" class="nav-item active bottom-item"><i class="fas fa-receipt"></i><span>חיובים (Charges)</span></a></li>
+                </ul>
+            </nav>
         </aside>
 
-        <main class="content-area">
+        <main class="main-content">
             <header class="main-header">
-                <h1 id="main-header-title">לוח מחוונים</h1>
-                <p class="welcome-message" id="welcome-message">ברוך הבא, שוטר!</p>
+                <h1 class="page-title">חיובים</h1>
+                <div class="header-actions">
+                    <input type="search" placeholder="חיפוש חיובים..." class="search-input">
+                    <button class="button green"><i class="fas fa-plus"></i> הוסף חיוב חדש</button>
+                    <button class="button purple"><i class="fas fa-filter"></i> סינון מתקדם</button>
+                </div>
             </header>
-
-            <section id="dashboard-section" class="section-content">
-                <h2>לוח מחוונים</h2>
-                <div class="dashboard-grid">
-                    <div class="dashboard-card">
-                        <i class="fas fa-chart-line"></i>
-                        <h3>פעילות אחרונה</h3>
-                        <p>צפה בסטטיסטיקות ופעולות אחרונות.</p>
-                    </div>
-                    <div class="dashboard-card">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <h3>מפה מבצעית</h3>
-                        <p>צפה באירועים ומיקומים בזמן אמת.</p>
-                    </div>
-                    <div class="dashboard-card">
-                        <i class="fas fa-bell"></i>
-                        <h3>התראות</h3>
-                        <p>קבל התראות חשובות בזמן אמת.</p>
-                    </div>
-                    <div class="dashboard-card">
-                        <i class="fas fa-cogs"></i>
-                        <h3>הגדרות מערכת</h3>
-                        <p>התאם אישית את הגדרות המערכת.</p>
-                    </div>
-                </div>
-            </section>
-
-            <section id="reports-section" class="section-content" style="display: none;">
-                <h2>דוחות</h2>
-                <div class="form-section">
-                    <h3>צור דוח חדש</h3>
-                    <div class="form-group">
-                        <label for="reportTitle">כותרת הדוח:</label>
-                        <input type="text" id="reportTitle" placeholder="הכנס כותרת לדוח">
-                    </div>
-                    <div class="form-group">
-                        <label for="reportDescription">תיאור:</label>
-                        <textarea id="reportDescription" placeholder="הכנס תיאור מפורט לדוח"></textarea>
-                    </div>
-                    <button id="addReportBtn">הוסף דוח</button>
-                </div>
-                <h3>דוחות קיימים</h3>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>כותרת</th>
-                            <th>תיאור</th>
-                            <th>תאריך</th>
-                            <th>פעולות</th>
-                        </tr>
-                    </thead>
-                    <tbody id="reportsTableBody">
-                        </tbody>
-                </table>
-            </section>
-
-            <section id="incidents-section" class="section-content" style="display: none;">
-                <h2>אירועים</h2>
-                <div class="form-section">
-                    <h3>דווח על אירוע חדש</h3>
-                    <div class="form-group">
-                        <label for="incidentType">סוג אירוע:</label>
-                        <input type="text" id="incidentType" placeholder="לדוגמה: שוד, תאונה, קטטה">
-                    </div>
-                    <div class="form-group">
-                        <label for="incidentLocation">מיקום:</label>
-                        <input type="text" id="incidentLocation" placeholder="הכנס מיקום האירוע">
-                    </div>
-                    <div class="form-group">
-                        <label for="incidentDescription">תיאור:</label>
-                        <textarea id="incidentDescription" placeholder="תיאור מפורט של האירוע"></textarea>
-                    </div>
-                    <button id="addIncidentBtn">דווח על אירוע</button>
-                </div>
-                <h3>אירועים פתוחים</h3>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>סוג</th>
-                            <th>מיקום</th>
-                            <th>תיאור</th>
-                            <th>סטטוס</th>
-                            <th>פעולות</th>
-                        </tr>
-                    </thead>
-                    <tbody id="incidentsTableBody">
-                        </tbody>
-                </table>
-            </section>
-
-            <section id="vehicles-section" class="section-content" style="display: none;">
-                <h2>כלי רכב</h2>
-                <div class="form-section">
-                    <h3>הוסף רכב חדש</h3>
-                    <div class="form-group">
-                        <label for="vehiclePlate">מספר רישוי:</label>
-                        <input type="text" id="vehiclePlate" placeholder="הכנס מספר רישוי">
-                    </div>
-                    <div class="form-group">
-                        <label for="vehicleModel">דגם:</label>
-                        <input type="text" id="vehicleModel" placeholder="הכנס דגם רכב">
-                    </div>
-                    <div class="form-group">
-                        <label for="vehicleStatus">סטטוס:</label>
-                        <select id="vehicleStatus">
-                            <option value="זמין">זמין</option>
-                            <option value="בשימוש">בשימוש</option>
-                            <option value="בתיקון">בתיקון</option>
+            <div class="content-area">
+                <div class="table-controls">
+                    <div class="table-filters">
+                        <select class="filter-select">
+                            <option value="">כל הסטטוסים</option>
+                            <option value="pending">ממתין</option>
+                            <option value="approved">מאושר</option>
+                            <option value="rejected">נדחה</option>
+                            <option value="completed">הושלם</option>
+                        </select>
+                        <select class="filter-select">
+                            <option value="">כל סוגי החיובים</option>
+                            <option value="traffic">תעבורה</option>
+                            <option value="felony">פשע חמור</option>
+                            <option value="misdemeanor">עבירה קלה</option>
                         </select>
                     </div>
-                    <button id="addVehicleBtn">הוסף רכב</button>
+                    <div class="pagination-controls">
+                        </div>
                 </div>
-                <h3>רכבים במערכת</h3>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>מספר רישוי</th>
-                            <th>דגם</th>
-                            <th>סטטוס</th>
-                            <th>פעולות</th>
-                        </tr>
-                    </thead>
-                    <tbody id="vehiclesTableBody">
-                        </tbody>
-                </table>
-            </section>
 
-            <section id="personnel-section" class="section-content" style="display: none;">
-                <h2>כוח אדם</h2>
-                <div class="form-section">
-                    <h3>הוסף שוטר חדש</h3>
-                    <div class="form-group">
-                        <label for="personnelName">שם מלא:</label>
-                        <input type="text" id="personnelName" placeholder="הכנס שם מלא">
-                    </div>
-                    <div class="form-group">
-                        <label for="personnelRank">דרגה:</label>
-                        <input type="text" id="personnelRank" placeholder="הכנס דרגה">
-                    </div>
-                    <div class="form-group">
-                        <label for="personnelUnit">יחידה:</label>
-                        <input type="text" id="personnelUnit" placeholder="הכנס יחידה">
-                    </div>
-                    <button id="addPersonnelBtn">הוסף שוטר</button>
+                <div class="data-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>תאריך</th>
+                                <th>שם אזרח</th>
+                                <th>תעודת זהות</th>
+                                <th>תיאור חיוב</th>
+                                <th>קנס</th>
+                                <th>מאסר</th>
+                                <th>סטטוס</th>
+                                <th>פעולות</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>01/06/2025</td>
+                                <td>דניאל לוי</td>
+                                <td>123456789</td>
+                                <td>נהיגה רשלנית</td>
+                                <td>$500</td>
+                                <td>שבוע</td>
+                                <td><span class="status-badge pending">ממתין</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="button orange"><i class="fas fa-edit"></i></button>
+                                        <button class="button red"><i class="fas fa-trash-alt"></i></button>
+                                        <button class="button green"><i class="fas fa-check"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>30/05/2025</td>
+                                <td>שרה כהן</td>
+                                <td>987654321</td>
+                                <td>גניבת רכב</td>
+                                <td>$1500</td>
+                                <td>חודש</td>
+                                <td><span class="status-badge approved">מאושר</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="button orange"><i class="fas fa-edit"></i></button>
+                                        <button class="button red"><i class="fas fa-trash-alt"></i></button>
+                                        <button class="button green"><i class="fas fa-check"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>28/05/2025</td>
+                                <td>איתי מזרחי</td>
+                                <td>456789123</td>
+                                <td>תקיפת שוטר</td>
+                                <td>$2000</td>
+                                <td>3 חודשים</td>
+                                <td><span class="status-badge rejected">נדחה</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="button orange"><i class="fas fa-edit"></i></button>
+                                        <button class="button red"><i class="fas fa-trash-alt"></i></button>
+                                        <button class="button green"><i class="fas fa-check"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>25/05/2025</td>
+                                <td>נועה פרץ</td>
+                                <td>654321987</td>
+                                <td>החזקת סמים</td>
+                                <td>$1000</td>
+                                <td>שבועיים</td>
+                                <td><span class="status-badge completed">הושלם</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="button orange"><i class="fas fa-edit"></i></button>
+                                        <button class="button red"><i class="fas fa-trash-alt"></i></button>
+                                        <button class="button green"><i class="fas fa-check"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                             <tr>
+                                <td>5</td>
+                                <td>20/05/2025</td>
+                                <td>יוסי יצחק</td>
+                                <td>112233445</td>
+                                <td>שימוש בלתי חוקי בנשק</td>
+                                <td>$2500</td>
+                                <td>6 חודשים</td>
+                                <td><span class="status-badge active">בתהליך</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="button orange"><i class="fas fa-edit"></i></button>
+                                        <button class="button red"><i class="fas fa-trash-alt"></i></button>
+                                        <button class="button green"><i class="fas fa-check"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                             <tr>
+                                <td>6</td>
+                                <td>18/05/2025</td>
+                                <td>מיה לוי</td>
+                                <td>223344556</td>
+                                <td>התפרצות לבית</td>
+                                <td>$1800</td>
+                                <td>חודש וחצי</td>
+                                <td><span class="status-badge pending">ממתין</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="button orange"><i class="fas fa-edit"></i></button>
+                                        <button class="button red"><i class="fas fa-trash-alt"></i></button>
+                                        <button class="button green"><i class="fas fa-check"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                             <tr>
+                                <td>7</td>
+                                <td>15/05/2025</td>
+                                <td>רון גורן</td>
+                                <td>334455667</td>
+                                <td>עבירות תנועה חוזרות</td>
+                                <td>$750</td>
+                                <td>ללא</td>
+                                <td><span class="status-badge approved">מאושר</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="button orange"><i class="fas fa-edit"></i></button>
+                                        <button class="button red"><i class="fas fa-trash-alt"></i></button>
+                                        <button class="button green"><i class="fas fa-check"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                             <tr>
+                                <td>8</td>
+                                <td>12/05/2025</td>
+                                <td>אנה בירן</td>
+                                <td>445566778</td>
+                                <td>זיוף מסמכים</td>
+                                <td>$1200</td>
+                                <td>3 שבועות</td>
+                                <td><span class="status-badge rejected">נדחה</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <button class="button orange"><i class="fas fa-edit"></i></button>
+                                        <button class="button red"><i class="fas fa-trash-alt"></i></button>
+                                        <button class="button green"><i class="fas fa-check"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <h3>שוטרים במערכת</h3>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>שם</th>
-                            <th>דרגה</th>
-                            <th>יחידה</th>
-                            <th>פעולות</th>
-                        </tr>
-                    </thead>
-                    <tbody id="personnelTableBody">
-                        </tbody>
-                </table>
-            </section>
-
-            <section id="codes-commands-section" class="section-content" style="display: none;">
-                <h2>קודים ופקודות</h2>
-                <div class="form-section">
-                    <h3>הוסף קוד/פקודה חדשה</h3>
-                    <div class="form-group">
-                        <label for="codeCommandTitle">כותרת:</label>
-                        <input type="text" id="codeCommandTitle" placeholder="הכנס כותרת">
-                    </div>
-                    <div class="form-group">
-                        <label for="codeCommandDescription">תיאור:</label>
-                        <textarea id="codeCommandDescription" placeholder="הכנס תיאור/פירוט"></textarea>
-                    </div>
-                    <button id="addCodeCommandBtn">הוסף</button>
-                </div>
-                <h3>רשימת קודים ופקודות</h3>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>כותרת</th>
-                            <th>תיאור</th>
-                            <th>פעולות</th>
-                        </tr>
-                    </thead>
-                    <tbody id="codesCommandsTableBody">
-                        </tbody>
-                </table>
-            </section>
-
-            <section id="citizens-section" class="section-content" style="display: none;">
-                <h2>אזרחים</h2>
-                <div class="form-section">
-                    <h3>הוסף אזרח חדש</h3>
-                    <div class="form-group">
-                        <label for="citizenName">שם מלא:</label>
-                        <input type="text" id="citizenName" placeholder="הכנס שם מלא">
-                    </div>
-                    <div class="form-group">
-                        <label for="citizenID">מספר ת"ז / מזהה:</label>
-                        <input type="text" id="citizenID" placeholder="הכנס מספר ת\"ז/מזהה">
-                    </div>
-                    <button id="addCitizenBtn">הוסף אזרח</button>
-                </div>
-                <h3>רשימת אזרחים</h3>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>שם מלא</th>
-                            <th>ת"ז / מזהה</th>
-                            <th>פעולות</th>
-                        </tr>
-                    </thead>
-                    <tbody id="citizensTableBody">
-                        </tbody>
-                </table>
-            </section>
-
+            </div>
         </main>
     </div>
 
     <script>
-        // --- Security Check: Ensure user is logged in ---
-        document.addEventListener('DOMContentLoaded', () => {
-            if (localStorage.getItem('loggedIn') !== 'true') {
-                window.location.href = 'login.html'; // Redirect to login page if not logged in
-                return; // Stop further script execution
-            }
-            const loggedInUser = localStorage.getItem('loggedInUser') || 'שוטר'; // Default if not found
-            document.getElementById('welcome-message').textContent = `ברוך הבא, ${loggedInUser}!`;
-        });
-
-        // --- General Application Logic ---
-        const sidebarNav = document.querySelector('.sidebar-nav');
-        const contentSections = document.querySelectorAll('.section-content');
-        const mainHeaderTitle = document.getElementById('main-header-title');
-
-        // Discord Webhook URLs (Replace with your actual webhooks)
-        const WEBHOOK_URLS = {
-            reports: 'YOUR_REPORTS_WEBHOOK_URL_HERE',
-            incidents: 'YOUR_INCIDENTS_WEBHOOK_URL_HERE',
-            vehicles: 'YOUR_VEHICLES_WEBHOOK_URL_HERE',
-            personnel: 'YOUR_PERSONNEL_WEBHOOK_URL_HERE',
-            codesCommands: 'YOUR_CODES_COMMANDS_WEBHOOK_URL_HERE',
-            citizens: 'YOUR_CITIZENS_WEBHOOK_URL_HERE',
-        };
-
-        // Function to send Discord message
-        async function sendDiscordMessage(webhookUrl, message, title = "הודעה מהמערכת") {
-            if (webhookUrl.includes("YOUR_")) {
-                console.warn(`Webhook URL for ${title} is not set. Message not sent to Discord.`);
-                return;
-            }
-            try {
-                const response = await fetch(webhookUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        embeds: [{
-                            title: title,
-                            description: message,
-                            color: 14710896 // A nice red color for Discord embeds
-                        }]
-                    }),
+        // במידה ותרצה להוסיף פונקציונליות JS בהמשך, היא תמוקם כאן.
+        // לדוגמה, לוגיקה לסימון פריט בתפריט הצד:
+        document.addEventListener('DOMContentLoaded', function() {
+            const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', function(event) {
+                    navItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    // בפועל, כאן היית טוען תוכן לדף.
+                    // כרגע זה רק לצורך ויזואלי.
+                    event.preventDefault(); // מונע קפיצה של הדף למעלה
                 });
-                if (!response.ok) {
-                    console.error('Failed to send Discord message:', response.status, await response.text());
-                    alert('שגיאה בשליחת הודעה לדיסקורד.');
-                } else {
-                    console.log('Discord message sent successfully!');
-                }
-            } catch (error) {
-                console.error('Error sending Discord message:', error);
-                alert('שגיאה בשליחת הודעה לדיסקורד.');
-            }
-        }
-
-        function showSection(sectionId) {
-            contentSections.forEach(section => {
-                section.style.display = 'none';
             });
-            document.getElementById(sectionId).style.display = 'block';
-        }
-
-        function updateMainHeaderTitle(title) {
-            mainHeaderTitle.textContent = title;
-        }
-
-        sidebarNav.addEventListener('click', (event) => {
-            if (event.target.tagName === 'A' || event.target.closest('A')) {
-                event.preventDefault();
-                const link = event.target.tagName === 'A' ? event.target : event.target.closest('A');
-                const sectionId = link.dataset.section + '-section';
-                const sectionTitle = link.textContent.trim();
-
-                // Remove active class from all
-                sidebarNav.querySelectorAll('li').forEach(li => li.classList.remove('active'));
-                // Add active class to the clicked one
-                link.closest('li').classList.add('active');
-
-                showSection(sectionId);
-                updateMainHeaderTitle(sectionTitle);
-            }
-        });
-
-        // --- Reports Section Logic (Basic example with Discord webhook) ---
-        const addReportBtn = document.getElementById('addReportBtn');
-        const reportsTableBody = document.getElementById('reportsTableBody');
-
-        let reports = JSON.parse(localStorage.getItem('reports')) || [];
-
-        function renderReports() {
-            reportsTableBody.innerHTML = ''; // Clear existing rows
-            if (reports.length === 0) {
-                reportsTableBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--secondary-text-color);">אין דוחות להצגה.</td></tr>';
-                return;
-            }
-            reports.forEach((report, index) => {
-                const row = reportsTableBody.insertRow();
-                row.innerHTML = `
-                    <td>${report.title}</td>
-                    <td>${report.description}</td>
-                    <td>${report.date}</td>
-                    <td class="actions">
-                        <button class="edit-btn" data-index="${index}">ערוך</button>
-                        <button class="delete-btn" data-index="${index}">מחק</button>
-                    </td>
-                `;
-            });
-        }
-
-        addReportBtn.addEventListener('click', async () => {
-            const titleInput = document.getElementById('reportTitle');
-            const descriptionInput = document.getElementById('reportDescription');
-
-            const title = titleInput.value.trim();
-            const description = descriptionInput.value.trim();
-            const date = new Date().toLocaleDateString('he-IL'); // Format date for Hebrew
-
-            if (title && description) {
-                const newReport = { title, description, date };
-                reports.push(newReport);
-                localStorage.setItem('reports', JSON.stringify(reports)); // Save to local storage
-                renderReports();
-
-                const message = `**דוח חדש:**\nכותרת: ${title}\nתיאור: ${description}\nתאריך: ${date}`;
-                await sendDiscordMessage(WEBHOOK_URLS.reports, message, 'מערכת דוחות');
-
-                titleInput.value = '';
-                descriptionInput.value = '';
-                alert('דוח נוסף בהצלחה!');
-            } else {
-                alert('אנא מלא את כל השדות של הדוח.');
-            }
-        });
-
-        reportsTableBody.addEventListener('click', async (event) => {
-            if (event.target.classList.contains('delete-btn')) {
-                const index = event.target.dataset.index;
-                if (confirm(`האם אתה בטוח שברצונך למחוק את הדוח "${reports[index].title}"?`)) {
-                    const deletedReport = reports.splice(index, 1)[0];
-                    localStorage.setItem('reports', JSON.stringify(reports));
-                    renderReports();
-                    const message = `**דוח נמחק:**\nכותרת: ${deletedReport.title}\nתיאור: ${deletedReport.description}\nתאריך: ${deletedReport.date}`;
-                    await sendDiscordMessage(WEBHOOK_URLS.reports, message, 'מערכת דוחות - מחיקה');
-                    alert('דוח נמחק בהצלחה.');
-                }
-            } else if (event.target.classList.contains('edit-btn')) {
-                const index = event.target.dataset.index;
-                const reportToEdit = reports[index];
-
-                const newTitle = prompt('ערוך כותרת דוח:', reportToEdit.title);
-                if (newTitle === null) return; // User cancelled
-
-                const newDescription = prompt('ערוך תיאור דוח:', reportToEdit.description);
-                if (newDescription === null) return; // User cancelled
-
-                if (newTitle.trim() !== '' && newDescription.trim() !== '') {
-                    reportToEdit.title = newTitle.trim();
-                    reportToEdit.description = newDescription.trim();
-                    localStorage.setItem('reports', JSON.stringify(reports));
-                    renderReports();
-                    const message = `**דוח עודכן:**\nכותרת: ${reportToEdit.title}\nתיאור: ${reportToEdit.description}\nתאריך: ${reportToEdit.date}`;
-                    await sendDiscordMessage(WEBHOOK_URLS.reports, message, 'מערכת דוחות - עדכון');
-                    alert('דוח עודכן בהצלחה.');
-                } else {
-                    alert('שדות הדוח אינם יכולים להיות ריקים.');
-                }
-            }
-        });
-
-        renderReports(); // Initial render of reports
-
-        // --- Incidents Section Logic (Basic example with Discord webhook) ---
-        const addIncidentBtn = document.getElementById('addIncidentBtn');
-        const incidentsTableBody = document.getElementById('incidentsTableBody');
-
-        let incidents = JSON.parse(localStorage.getItem('incidents')) || [];
-
-        function renderIncidents() {
-            incidentsTableBody.innerHTML = '';
-            if (incidents.length === 0) {
-                incidentsTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--secondary-text-color);">אין אירועים להצגה.</td></tr>';
-                return;
-            }
-            incidents.forEach((incident, index) => {
-                const row = incidentsTableBody.insertRow();
-                row.innerHTML = `
-                    <td>${incident.type}</td>
-                    <td>${incident.location}</td>
-                    <td>${incident.description}</td>
-                    <td>${incident.status}</td>
-                    <td class="actions">
-                        <button class="edit-btn" data-index="${index}">ערוך</button>
-                        <button class="delete-btn" data-index="${index}">מחק</button>
-                    </td>
-                `;
-            });
-        }
-
-        addIncidentBtn.addEventListener('click', async () => {
-            const typeInput = document.getElementById('incidentType');
-            const locationInput = document.getElementById('incidentLocation');
-            const descriptionInput = document.getElementById('incidentDescription');
-
-            const type = typeInput.value.trim();
-            const location = locationInput.value.trim();
-            const description = descriptionInput.value.trim();
-            const status = "פתוח"; // Default status
-
-            if (type && location && description) {
-                const newIncident = { type, location, description, status };
-                incidents.push(newIncident);
-                localStorage.setItem('incidents', JSON.stringify(incidents));
-                renderIncidents();
-
-                const message = `**אירוע חדש:**\nסוג: ${type}\nמיקום: ${location}\nתיאור: ${description}\nסטטוס: ${status}`;
-                await sendDiscordMessage(WEBHOOK_URLS.incidents, message, 'מערכת אירועים');
-
-                typeInput.value = '';
-                locationInput.value = '';
-                descriptionInput.value = '';
-                alert('אירוע דווח בהצלחה!');
-            } else {
-                alert('אנא מלא את כל השדות של האירוע.');
-            }
-        });
-
-        incidentsTableBody.addEventListener('click', async (event) => {
-            if (event.target.classList.contains('delete-btn')) {
-                const index = event.target.dataset.index;
-                if (confirm(`האם אתה בטוח שברצונך למחוק את האירוע מסוג "${incidents[index].type}"?`)) {
-                    const deletedIncident = incidents.splice(index, 1)[0];
-                    localStorage.setItem('incidents', JSON.stringify(incidents));
-                    renderIncidents();
-                    const message = `**אירוע נמחק:**\nסוג: ${deletedIncident.type}\nמיקום: ${deletedIncident.location}\nתיאור: ${deletedIncident.description}\nסטטוס: ${deletedIncident.status}`;
-                    await sendDiscordMessage(WEBHOOK_URLS.incidents, message, 'מערכת אירועים - מחיקה');
-                    alert('אירוע נמחק בהצלחה.');
-                }
-            } else if (event.target.classList.contains('edit-btn')) {
-                const index = event.target.dataset.index;
-                const incidentToEdit = incidents[index];
-
-                const newType = prompt('ערוך סוג אירוע:', incidentToEdit.type);
-                if (newType === null) return;
-                const newLocation = prompt('ערוך מיקום אירוע:', incidentToEdit.location);
-                if (newLocation === null) return;
-                const newDescription = prompt('ערוך תיאור אירוע:', incidentToEdit.description);
-                if (newDescription === null) return;
-                const newStatus = prompt('ערוך סטטוס אירוע (פתוח/סגור/בטיפול):', incidentToEdit.status);
-                if (newStatus === null) return;
-
-                if (newType.trim() !== '' && newLocation.trim() !== '' && newDescription.trim() !== '' && newStatus.trim() !== '') {
-                    incidentToEdit.type = newType.trim();
-                    incidentToEdit.location = newLocation.trim();
-                    incidentToEdit.description = newDescription.trim();
-                    incidentToEdit.status = newStatus.trim();
-                    localStorage.setItem('incidents', JSON.stringify(incidents));
-                    renderIncidents();
-                    const message = `**אירוע עודכן:**\nסוג: ${incidentToEdit.type}\nמיקום: ${incidentToEdit.location}\nתיאור: ${incidentToEdit.description}\nסטטוס: ${incidentToEdit.status}`;
-                    await sendDiscordMessage(WEBHOOK_URLS.incidents, message, 'מערכת אירועים - עדכון');
-                    alert('אירוע עודכן בהצלחה.');
-                } else {
-                    alert('שדות האירוע אינם יכולים להיות ריקים.');
-                }
-            }
-        });
-
-        renderIncidents(); // Initial render of incidents
-
-        // --- Vehicles Section Logic (Basic example with Discord webhook) ---
-        const addVehicleBtn = document.getElementById('addVehicleBtn');
-        const vehiclesTableBody = document.getElementById('vehiclesTableBody');
-
-        let vehicles = JSON.parse(localStorage.getItem('vehicles')) || [];
-
-        function renderVehicles() {
-            vehiclesTableBody.innerHTML = '';
-            if (vehicles.length === 0) {
-                vehiclesTableBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--secondary-text-color);">אין רכבים להצגה.</td></tr>';
-                return;
-            }
-            vehicles.forEach((vehicle, index) => {
-                const row = vehiclesTableBody.insertRow();
-                row.innerHTML = `
-                    <td>${vehicle.plate}</td>
-                    <td>${vehicle.model}</td>
-                    <td>${vehicle.status}</td>
-                    <td class="actions">
-                        <button class="edit-btn" data-index="${index}">ערוך</button>
-                        <button class="delete-btn" data-index="${index}">מחק</button>
-                    </td>
-                `;
-            });
-        }
-
-        addVehicleBtn.addEventListener('click', async () => {
-            const plateInput = document.getElementById('vehiclePlate');
-            const modelInput = document.getElementById('vehicleModel');
-            const statusInput = document.getElementById('vehicleStatus');
-
-            const plate = plateInput.value.trim();
-            const model = modelInput.value.trim();
-            const status = statusInput.value;
-
-            if (plate && model && status) {
-                const newVehicle = { plate, model, status };
-                vehicles.push(newVehicle);
-                localStorage.setItem('vehicles', JSON.stringify(vehicles));
-                renderVehicles();
-
-                const message = `**רכב חדש נוסף:**\nמספר רישוי: ${plate}\nדגם: ${model}\nסטטוס: ${status}`;
-                await sendDiscordMessage(WEBHOOK_URLS.vehicles, message, 'מערכת רכבים');
-
-                plateInput.value = '';
-                modelInput.value = '';
-                statusInput.value = 'זמין'; // Reset to default
-                alert('רכב נוסף בהצלחה!');
-            } else {
-                alert('אנא מלא את כל השדות של הרכב.');
-            }
-        });
-
-        vehiclesTableBody.addEventListener('click', async (event) => {
-            if (event.target.classList.contains('delete-btn')) {
-                const index = event.target.dataset.index;
-                if (confirm(`האם אתה בטוח שברצונך למחוק את הרכב עם מספר רישוי "${vehicles[index].plate}"?`)) {
-                    const deletedVehicle = vehicles.splice(index, 1)[0];
-                    localStorage.setItem('vehicles', JSON.stringify(vehicles));
-                    renderVehicles();
-                    const message = `**רכב נמחק:**\nמספר רישוי: ${deletedVehicle.plate}\nדגם: ${deletedVehicle.model}\nסטטוס: ${deletedVehicle.status}`;
-                    await sendDiscordMessage(WEBHOOK_URLS.vehicles, message, 'מערכת רכבים - מחיקה');
-                    alert('רכב נמחק בהצלחה.');
-                }
-            } else if (event.target.classList.contains('edit-btn')) {
-                const index = event.target.dataset.index;
-                const vehicleToEdit = vehicles[index];
-
-                const newPlate = prompt('ערוך מספר רישוי:', vehicleToEdit.plate);
-                if (newPlate === null) return;
-                const newModel = prompt('ערוך דגם:', vehicleToEdit.model);
-                if (newModel === null) return;
-                const newStatus = prompt('ערוך סטטוס (זמין/בשימוש/בתיקון):', vehicleToEdit.status);
-                if (newStatus === null) return;
-
-                if (newPlate.trim() !== '' && newModel.trim() !== '' && newStatus.trim() !== '') {
-                    vehicleToEdit.plate = newPlate.trim();
-                    vehicleToEdit.model = newModel.trim();
-                    vehicleToEdit.status = newStatus.trim();
-                    localStorage.setItem('vehicles', JSON.stringify(vehicles));
-                    renderVehicles();
-                    const message = `**רכב עודכן:**\nמספר רישוי: ${vehicleToEdit.plate}\nדגם: ${vehicleToEdit.model}\nסטטוס: ${vehicleToEdit.status}`;
-                    await sendDiscordMessage(WEBHOOK_URLS.vehicles, message, 'מערכת רכבים - עדכון');
-                    alert('רכב עודכן בהצלחה.');
-                } else {
-                    alert('שדות הרכב אינם יכולים להיות ריקים.');
-                }
-            }
-        });
-
-        renderVehicles(); // Initial render of vehicles
-
-        // --- Personnel Section Logic (Basic example with Discord webhook) ---
-        const addPersonnelBtn = document.getElementById('addPersonnelBtn');
-        const personnelTableBody = document.getElementById('personnelTableBody');
-
-        let personnel = JSON.parse(localStorage.getItem('personnel')) || [];
-
-        function renderPersonnel() {
-            personnelTableBody.innerHTML = '';
-            if (personnel.length === 0) {
-                personnelTableBody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--secondary-text-color);">אין כוח אדם להצגה.</td></tr>';
-                return;
-            }
-            personnel.forEach((p, index) => {
-                const row = personnelTableBody.insertRow();
-                row.innerHTML = `
-                    <td>${p.name}</td>
-                    <td>${p.rank}</td>
-                    <td>${p.unit}</td>
-                    <td class="actions">
-                        <button class="edit-btn" data-index="${index}">ערוך</button>
-                        <button class="delete-btn" data-index="${index}">מחק</button>
-                    </td>
-                `;
-            });
-        }
-
-        addPersonnelBtn.addEventListener('click', async () => {
-            const nameInput = document.getElementById('personnelName');
-            const rankInput = document.getElementById('personnelRank');
-            const unitInput = document.getElementById('personnelUnit');
-
-            const name = nameInput.value.trim();
-            const rank = rankInput.value.trim();
-            const unit = unitInput.value.trim();
-
-            if (name && rank && unit) {
-                const newPersonnel = { name, rank, unit };
-                personnel.push(newPersonnel);
-                localStorage.setItem('personnel', JSON.stringify(personnel));
-                renderPersonnel();
-
-                const message = `**שוטר חדש נוסף:**\nשם: ${name}\nדרגה: ${rank}\nיחידה: ${unit}`;
-                await sendDiscordMessage(WEBHOOK_URLS.personnel, message, 'מערכת כוח אדם');
-
-                nameInput.value = '';
-                rankInput.value = '';
-                unitInput.value = '';
-                alert('שוטר נוסף בהצלחה!');
-            } else {
-                alert('אנא מלא את כל השדות של השוטר.');
-            }
-        });
-
-        personnelTableBody.addEventListener('click', async (event) => {
-            if (event.target.classList.contains('delete-btn')) {
-                const index = event.target.dataset.index;
-                if (confirm(`האם אתה בטוח שברצונך למחוק את השוטר "${personnel[index].name}"?`)) {
-                    const deletedPersonnel = personnel.splice(index, 1)[0];
-                    localStorage.setItem('personnel', JSON.stringify(personnel));
-                    renderPersonnel();
-                    const message = `**שוטר נמחק:**\nשם: ${deletedPersonnel.name}\nדרגה: ${deletedPersonnel.rank}\nיחידה: ${deletedPersonnel.unit}`;
-                    await sendDiscordMessage(WEBHOOK_URLS.personnel, message, 'מערכת כוח אדם - מחיקה');
-                    alert('שוטר נמחק בהצלחה.');
-                }
-            } else if (event.target.classList.contains('edit-btn')) {
-                const index = event.target.dataset.index;
-                const personnelToEdit = personnel[index];
-
-                const newName = prompt('ערוך שם מלא:', personnelToEdit.name);
-                if (newName === null) return;
-                const newRank = prompt('ערוך דרגה:', personnelToEdit.rank);
-                if (newRank === null) return;
-                const newUnit = prompt('ערוך יחידה:', personnelToEdit.unit);
-                if (newUnit === null) return;
-
-                if (newName.trim() !== '' && newRank.trim() !== '' && newUnit.trim() !== '') {
-                    personnelToEdit.name = newName.trim();
-                    personnelToEdit.rank = newRank.trim();
-                    personnelToEdit.unit = newUnit.trim();
-                    localStorage.setItem('personnel', JSON.stringify(personnel));
-                    renderPersonnel();
-                    const message = `**שוטר עודכן:**\nשם: ${personnelToEdit.name}\nדרגה: ${personnelToEdit.rank}\nיחידה: ${personnelToEdit.unit}`;
-                    await sendDiscordMessage(WEBHOOK_URLS.personnel, message, 'מערכת כוח אדם - עדכון');
-                    alert('שוטר עודכן בהצלחה.');
-                } else {
-                    alert('שדות השוטר אינם יכולים להיות ריקים.');
-                }
-            }
-        });
-
-        renderPersonnel(); // Initial render of personnel
-
-        // --- Codes & Commands Section Logic (Basic example with Discord webhook) ---
-        const addCodeCommandBtn = document.getElementById('addCodeCommandBtn');
-        const codesCommandsTableBody = document.getElementById('codesCommandsTableBody');
-
-        let codesCommands = JSON.parse(localStorage.getItem('codesCommands')) || [];
-
-        function renderCodesCommands() {
-            codesCommandsTableBody.innerHTML = '';
-            if (codesCommands.length === 0) {
-                codesCommandsTableBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--secondary-text-color);">אין קודים או פקודות להצגה.</td></tr>';
-                return;
-            }
-            codesCommands.forEach((item, index) => {
-                const row = codesCommandsTableBody.insertRow();
-                row.innerHTML = `
-                    <td>${item.title}</td>
-                    <td>${item.description}</td>
-                    <td class="actions">
-                        <button class="edit-btn" data-index="${index}">ערוך</button>
-                        <button class="delete-btn" data-index="${index}">מחק</button>
-                    </td>
-                `;
-            });
-        }
-
-        addCodeCommandBtn.addEventListener('click', async () => {
-            const titleInput = document.getElementById('codeCommandTitle');
-            const descriptionInput = document.getElementById('codeCommandDescription');
-
-            const title = titleInput.value.trim();
-            const description = descriptionInput.value.trim();
-
-            if (title && description) {
-                const newItem = { title, description };
-                codesCommands.push(newItem);
-                localStorage.setItem('codesCommands', JSON.stringify(codesCommands));
-                renderCodesCommands();
-
-                const message = `**קוד/פקודה חדשה נוספה:**\nכותרת: ${title}\nתיאור: ${description}`;
-                await sendDiscordMessage(WEBHOOK_URLS.codesCommands, message, 'מערכת קודים & פקודות');
-
-                titleInput.value = '';
-                descriptionInput.value = '';
-                alert('קוד/פקודה נוספה בהצלחה!');
-            } else {
-                alert('אנא מלא את כל השדות של הקוד/פקודה.');
-            }
-        });
-
-        codesCommandsTableBody.addEventListener('click', async (event) => {
-            if (event.target.classList.contains('delete-btn')) {
-                const index = event.target.dataset.index;
-                if (confirm(`האם אתה בטוח שברצונך למחוק את "${codesCommands[index].title}"?`)) {
-                    const deletedItem = codesCommands.splice(index, 1)[0];
-                    localStorage.setItem('codesCommands', JSON.stringify(codesCommands));
-                    renderCodesCommands();
-                    const message = `**קוד/פקודה נמחקה:**\nכותרת: ${deletedItem.title}\nתיאור: ${deletedItem.description}`;
-                    await sendDiscordMessage(WEBHOOK_URLS.codesCommands, message, 'מערכת קודים & פקודות - מחיקה');
-                    alert('קוד/פקודה נמחקה בהצלחה.');
-                }
-            } else if (event.target.classList.contains('edit-btn')) {
-                const index = event.target.dataset.index;
-                const itemToEdit = codesCommands[index];
-
-                const newTitle = prompt('ערוך כותרת:', itemToEdit.title);
-                if (newTitle === null) return;
-                const newDescription = prompt('ערוך תיאור:', itemToEdit.description);
-                if (newDescription === null) return;
-
-                if (newTitle.trim() !== '' && newDescription.trim() !== '') {
-                    itemToEdit.title = newTitle.trim();
-                    itemToEdit.description = newDescription.trim();
-                    localStorage.setItem('codesCommands', JSON.stringify(codesCommands));
-                    renderCodesCommands();
-                    const message = `**קוד/פקודה עודכנה:**\nכותרת: ${itemToEdit.title}\nתיאור: ${itemToEdit.description}`;
-                    await sendDiscordMessage(WEBHOOK_URLS.codesCommands, message, 'מערכת קודים & פקודות - עדכון');
-                    alert('קוד/פקודה עודכנה בהצלחה.');
-                } else {
-                    alert('שדות הקוד/פקודה אינם יכולים להיות ריקים.');
-                }
-            }
-        });
-
-        renderCodesCommands();
-
-        // --- Citizens Section Logic (Basic example with Discord webhook) ---
-        const addCitizenBtn = document.getElementById('addCitizenBtn');
-        const citizensTableBody = document.getElementById('citizensTableBody');
-
-        let citizens = JSON.parse(localStorage.getItem('citizens')) || [];
-
-        function renderCitizens() {
-            citizensTableBody.innerHTML = '';
-            if (citizens.length === 0) {
-                citizensTableBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--secondary-text-color);">אין אזרחים להצגה.</td></tr>';
-                return;
-            }
-            citizens.forEach((citizen, index) => {
-                const row = citizensTableBody.insertRow();
-                row.innerHTML = `
-                    <td>${citizen.name}</td>
-                    <td>${citizen.id || 'לא צוין'}</td>
-                    <td class="actions">
-                        <button class="edit-btn" data-index="${index}">ערוך</button>
-                        <button class="delete-btn" data-index="${index}">מחק</button>
-                    </td>
-                `;
-            });
-        }
-
-        addCitizenBtn.addEventListener('click', async () => {
-            const nameInput = document.getElementById('citizenName');
-            const idInput = document.getElementById('citizenID');
-
-            const name = nameInput.value.trim();
-            const id = idInput.value.trim();
-
-            if (name) {
-                const newCitizen = { name, id };
-                citizens.push(newCitizen);
-                localStorage.setItem('citizens', JSON.stringify(citizens));
-                renderCitizens();
-
-                const message = `**אזרח חדש נוסף:**\nשם: ${name}\nמזהה: ${id || 'לא צוין'}`;
-                await sendDiscordMessage(WEBHOOK_URLS.citizens, message, 'מערכת אזרחים');
-
-                nameInput.value = '';
-                idInput.value = '';
-                alert(`אזרח ${name} נוסף בהצלחה!`);
-            } else {
-                alert('אנא הזן שם אזרח.');
-            }
-        });
-
-        citizensTableBody.addEventListener('click', async (event) => {
-            if (event.target.classList.contains('delete-btn')) {
-                const index = event.target.dataset.index;
-                if (confirm(`האם אתה בטוח שברצונך למחוק את האזרח "${citizens[index].name}"?`)) {
-                    const deletedCitizen = citizens.splice(index, 1)[0];
-                    localStorage.setItem('citizens', JSON.stringify(citizens));
-                    renderCitizens();
-                    const message = `**אזרח נמחק:**\nשם: ${deletedCitizen.name}\nמזהה: ${deletedCitizen.id || 'לא צוין'}`;
-                    await sendDiscordMessage(WEBHOOK_URLS.citizens, message, 'מערכת אזרחים - מחיקה');
-                    alert('אזרח נמחק בהצלחה.');
-                }
-            } else if (event.target.classList.contains('edit-btn')) {
-                const index = event.target.dataset.index;
-                const citizenToEdit = citizens[index];
-
-                const newName = prompt('ערוך שם אזרח:', citizenToEdit.name);
-                if (newName === null) return;
-                const newID = prompt('ערוך מספר ת"ז/מזהה:', citizenToEdit.id);
-                if (newID === null) return;
-
-                if (newName.trim() !== '' && newID.trim() !== '') {
-                    citizenToEdit.name = newName.trim();
-                    citizenToEdit.id = newID.trim();
-                    localStorage.setItem('citizens', JSON.stringify(citizens));
-                    renderCitizens();
-                    const message = `**אזרח עודכן:**\nשם: ${citizenToEdit.name}\nמזהה: ${citizenToEdit.id || 'לא צוין'}`;
-                    await sendDiscordMessage(WEBHOOK_URLS.citizens, message, 'מערכת אזרחים - עדכון');
-                    alert('פרטי האזרח עודכנו בהצלחה.');
-                } else {
-                    alert('שם האזרח אינו יכול להיות ריק.');
-                }
-            }
-        });
-
-        renderCitizens(); // Initial render of citizens
-
-
-        // Initial Load (after security check)
-        document.addEventListener('DOMContentLoaded', () => {
-            const initialSectionId = document.querySelector('.sidebar-nav li.active a').dataset.section + '-section';
-            const initialSectionTitle = document.querySelector('.sidebar-nav li.active a').textContent.trim();
-            showSection(initialSectionId);
-            updateMainHeaderTitle(initialSectionTitle);
         });
     </script>
 </body>
