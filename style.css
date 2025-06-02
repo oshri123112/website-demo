@@ -1,0 +1,631 @@
+/* General styles */
+:root {
+    --primary-color: #0056b3;
+    --secondary-color: #007bff;
+    --background-color: #f4f7f6;
+    --card-background: #ffffff;
+    --border-color: #e0e0e0;
+    --text-color: #333;
+    --secondary-text-color: #666;
+    --hover-color: #004085;
+    --sidebar-bg: #2c3e50;
+    --sidebar-text: #ecf0f1;
+    --sidebar-hover: #34495e;
+    --success-color: #28a745;
+    --error-color: #dc3545;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    display: flex; /* Ensure body takes full height and flexes content */
+    min-height: 100vh; /* Minimum height for body */
+    flex-direction: column; /* Stack content vertically */
+}
+
+/* Login Page Styles */
+#login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: var(--sidebar-bg); /* Darker background for login */
+    width: 100%;
+    position: absolute; /* Take full screen */
+    top: 0;
+    left: 0;
+    z-index: 1000; /* Ensure it's on top */
+}
+
+.login-box {
+    background-color: var(--card-background);
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    width: 100%;
+    max-width: 400px;
+}
+
+.login-box h2 {
+    color: var(--primary-color);
+    margin-bottom: 30px;
+    font-size: 2em;
+}
+
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: var(--secondary-text-color);
+}
+
+.input-group input[type="text"],
+.input-group input[type="password"] {
+    width: calc(100% - 20px);
+    padding: 12px 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 1em;
+    direction: ltr; /* Ensure input direction is LTR for passwords/usernames */
+}
+
+.login-box button[type="submit"] {
+    background-color: var(--secondary-color);
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1.1em;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    width: 100%;
+}
+
+.login-box button[type="submit"]:hover {
+    background-color: var(--primary-color);
+}
+
+.error-message {
+    color: var(--error-color);
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+/* Main Content Styles */
+#main-content {
+    display: flex;
+    flex-grow: 1; /* Allows main content to take remaining space */
+}
+
+/* Existing styles for header, sidebar, main content area, etc.
+   Ensure these styles are compatible with the new flex layout on #main-content.
+   You might need to adjust widths if they were fixed before. */
+
+.main-header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    width: 100%; /* Take full width */
+}
+
+.main-header h1 {
+    margin: 0;
+    font-size: 1.8em;
+}
+
+.logout-button {
+    background-color: var(--error-color);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+    background-color: #c82333; /* Darker red */
+}
+
+.sidebar {
+    width: 250px;
+    background-color: var(--sidebar-bg);
+    color: var(--sidebar-text);
+    padding: 20px 0;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    flex-shrink: 0; /* Prevent sidebar from shrinking */
+}
+
+.sidebar .nav-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar .nav-links li {
+    margin-bottom: 5px;
+}
+
+.sidebar .nav-links li a {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    color: var(--sidebar-text);
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+    gap: 15px; /* Space between icon and text */
+}
+
+.sidebar .nav-links li a i {
+    font-size: 1.2em;
+    width: 25px; /* Fixed width for icons */
+    text-align: center;
+}
+
+.sidebar .nav-links li.active a,
+.sidebar .nav-links li a:hover {
+    background-color: var(--sidebar-hover);
+    border-right: 5px solid var(--secondary-color);
+}
+
+.content-area {
+    flex-grow: 1; /* Allows content area to take remaining space */
+    padding: 25px;
+    background-color: var(--background-color);
+    overflow-y: auto; /* Enable scrolling for content if it overflows */
+    box-sizing: border-box; /* Include padding in width calculation */
+}
+
+.content-section {
+    background-color: var(--card-background);
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-bottom: 25px;
+}
+
+.content-section h2 {
+    color: var(--primary-color);
+    margin-top: 0;
+    margin-bottom: 20px;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+/* Utility classes */
+.hidden {
+    display: none !important;
+}
+
+/* Action Buttons */
+.action-button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.95em;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    margin-right: 10px; /* Space between buttons */
+}
+
+.action-button:last-child {
+    margin-right: 0;
+}
+
+.action-button:hover {
+    background-color: var(--hover-color);
+    transform: translateY(-1px);
+}
+
+.action-button.primary {
+    background-color: var(--primary-color);
+}
+
+.action-button.primary:hover {
+    background-color: var(--hover-color);
+}
+
+.action-button.secondary {
+    background-color: var(--secondary-text-color);
+}
+
+.action-button.secondary:hover {
+    background-color: #555;
+}
+
+.action-button.delete-charge,
+.action-button.delete-report,
+.action-button.delete-bolo,
+.action-button.delete-vehicle,
+.action-button.delete-evidence,
+.action-button.delete-weapon,
+.action-button.delete-staff,
+.action-button.delete-roster,
+.action-button.delete-code-command {
+    background-color: var(--error-color);
+}
+
+.action-button.delete-charge:hover,
+.action-button.delete-report:hover,
+.action-button.delete-bolo:hover,
+.action-button.delete-vehicle:hover,
+.action-button.delete-evidence:hover,
+.action-button.delete-weapon:hover,
+.action-button.delete-staff:hover,
+.action-button.delete-roster:hover,
+.action-button.delete-code-command:hover {
+    background-color: #c82333;
+}
+
+.action-button i {
+    margin-right: 5px; /* Space between icon and text */
+}
+
+.section-actions {
+    margin-bottom: 20px;
+    text-align: right; /* Align action buttons to the right */
+}
+
+/* Form Styles */
+.form-container {
+    background-color: var(--card-background);
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    margin-bottom: 25px;
+    border-left: 5px solid var(--secondary-color);
+}
+
+.form-container h3 {
+    margin-top: 0;
+    color: var(--primary-color);
+    margin-bottom: 20px;
+}
+
+.data-form .form-group {
+    margin-bottom: 15px;
+}
+
+.data-form label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: var(--secondary-text-color);
+}
+
+.data-form input[type="text"],
+.data-form input[type="number"],
+.data-form textarea,
+.data-form select {
+    width: calc(100% - 20px);
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    font-size: 1em;
+    box-sizing: border-box; /* Include padding and border in element's total width and height */
+    direction: rtl; /* Set default direction for form inputs if needed */
+}
+
+.data-form textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.data-form .form-buttons {
+    margin-top: 25px;
+    text-align: right;
+}
+
+/* Table Styles */
+.table-container {
+    overflow-x: auto; /* Enable horizontal scrolling on small screens */
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.data-table th,
+.data-table td {
+    border: 1px solid var(--border-color);
+    padding: 12px 15px;
+    text-align: right;
+}
+
+.data-table th {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+    z-index: 1; /* Keep header visible on scroll */
+}
+
+.data-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.data-table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+.data-table .actions-cell {
+    white-space: nowrap; /* Prevent buttons from wrapping */
+    width: 1%; /* Make sure it takes minimum width */
+    text-align: center;
+}
+
+/* Card Grid Styles */
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.card-item, .bolo-warrant-item {
+    background-color: var(--card-background);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-left: 5px solid var(--secondary-color);
+}
+
+.card-item .default-icon {
+    font-size: 3em;
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.card-item strong, .bolo-warrant-item h3 {
+    color: var(--primary-color);
+    margin-bottom: 5px;
+    font-size: 1.2em;
+}
+
+.card-item span, .card-item p, .bolo-warrant-item p {
+    color: var(--text-color);
+    font-size: 0.95em;
+}
+
+.card-item .actions-cell, .bolo-warrant-item .action-buttons-bolo {
+    margin-top: 15px;
+    display: flex;
+    justify-content: flex-end; /* Align buttons to the right */
+    gap: 10px;
+}
+
+/* Reports Specific Styles */
+.reports-container {
+    display: flex;
+    gap: 20px;
+    margin-top: 20px;
+    min-height: 400px; /* Ensure sufficient height for layout */
+}
+
+.reports-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex: 0 0 300px; /* Fixed width for the list */
+    background-color: var(--background-color);
+    border-right: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow-y: auto;
+    max-height: 600px; /* Limit height and enable scrolling */
+}
+
+.reports-list li {
+    padding: 15px 20px;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.reports-list li:hover {
+    background-color: #eef;
+}
+
+.reports-list li.active {
+    background-color: var(--secondary-color);
+    color: white;
+    border-right: 5px solid var(--primary-color); /* Highlight active item */
+}
+
+.reports-list li.active .report-summary-title,
+.reports-list li.active .report-summary-date {
+    color: white; /* Ensure text is visible on active background */
+}
+
+
+.report-summary-title {
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-bottom: 5px;
+}
+
+.reports-list li.active .report-summary-title {
+    color: white;
+}
+
+.report-summary-date {
+    font-size: 0.85em;
+    color: var(--secondary-text-color);
+}
+
+.reports-list li.active .report-summary-date {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+
+.report-detail-panel {
+    flex-grow: 1;
+    background-color: var(--card-background);
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    border-left: 5px solid var(--secondary-color);
+}
+
+.report-detail-panel h3 {
+    color: var(--primary-color);
+    margin-top: 0;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.detail-field {
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.detail-field strong {
+    color: var(--secondary-color);
+    display: inline-block;
+    width: 80px; /* Align labels */
+}
+
+/* Dashboard specific styles */
+.dashboard-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.stat-card {
+    background-color: var(--card-background);
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    text-align: center;
+    border-bottom: 5px solid var(--secondary-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+.stat-card h3 {
+    color: var(--primary-color);
+    font-size: 1.3em;
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.stat-card h3 i {
+    color: var(--secondary-color);
+    font-size: 1.5em;
+}
+
+.stat-card p {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: var(--text-color);
+    margin: 10px 0 0;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .main-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .main-header h1 {
+        margin-bottom: 10px;
+    }
+
+    #main-content {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        padding: 10px 0;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .sidebar .nav-links {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .sidebar .nav-links li {
+        width: auto;
+        flex-grow: 1; /* Allow items to grow */
+        margin-bottom: 0;
+    }
+
+    .sidebar .nav-links li a {
+        padding: 10px 15px;
+        justify-content: center; /* Center text and icon */
+        flex-direction: column; /* Stack icon and text */
+        gap: 5px;
+    }
+    .sidebar .nav-links li a i {
+        margin-right: 0;
+    }
+    .sidebar .nav-links li.active a,
+    .sidebar .nav-links li a:hover {
+        border-right: none;
+        border-bottom: 5px solid var(--secondary-color);
+    }
+
+    .content-area {
+        padding: 15px;
+    }
+
+    .reports-container {
+        flex-direction: column;
+    }
+
+    .reports-list {
+        flex: auto; /* Allow list to take full width */
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+    }
+}
