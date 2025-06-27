@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>מערכת דיווח משטרתית</title>
+    <title>מערכת דיווח</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -36,7 +36,7 @@
             margin-bottom: 5px;
             font-weight: bold;
         }
-        input[type="text"], input[type="password"], textarea {
+        input[type="text"], input[type="password"], select, textarea {
             width: calc(100% - 22px);
             padding: 10px;
             margin-bottom: 10px;
@@ -92,16 +92,24 @@
     <div id="loginScreen" class="container">
         <h1>התחברות למערכת</h1>
         <form id="loginForm">
+            <label for="system">בחר מערכת:</label>
+            <select id="system" required>
+                <option value="" disabled selected>בחר</option>
+                <option value="police">משטרת ישראל</option>
+                <option value="admin">צוות ניהולי</option>
+            </select>
+
             <label for="password">הזן סיסמה:</label>
             <input type="password" id="password" required>
+
             <button type="submit">התחבר</button>
-            <p id="loginError" style="color: red; display: none;">סיסמה שגויה</p>
+            <p id="loginError" style="color: red; display: none;">סיסמה שגויה או מערכת שגויה</p>
         </form>
     </div>
 
-    <!-- מערכת דיווח -->
+    <!-- מערכת הדיווח -->
     <div id="mainApp" class="container" style="display: none;">
-        <h1>מערכת דיווח משטרתית</h1>
+        <h1 id="systemTitle">מערכת דיווח</h1>
 
         <form id="reportForm">
             <h2>הוספת דוח חדש</h2>
@@ -120,13 +128,12 @@
         </div>
     </div>
 
-    <!-- Firebase Scripts -->
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
-    <!-- Script -->
     <script>
-        // קונפיגורציית Firebase שלך
+        // קונפיגורציית Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAAADd1lL5cgTgTxQOC8VSrjLlIsDlRyIk",
             authDomain: "policereportsystem-f23fd.firebaseapp.com",
@@ -136,8 +143,6 @@
             appId: "1:93022201022:web:b33be966dcac2ce8612aef",
             measurementId: "G-312TDJBX4T"
         };
-
-        // אתחול Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
@@ -146,29 +151,37 @@
         const mainApp = document.getElementById('mainApp');
         const loginForm = document.getElementById('loginForm');
         const passwordInput = document.getElementById('password');
+        const systemSelect = document.getElementById('system');
         const loginError = document.getElementById('loginError');
-        const CORRECT_PASSWORD = "police123";
+        const systemTitle = document.getElementById('systemTitle');
+
+        const SYSTEM_PASSWORDS = {
+            police: "police123",
+            admin: "admin321"
+        };
 
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
+            const selectedSystem = systemSelect.value;
             const enteredPassword = passwordInput.value;
 
-            if (enteredPassword === CORRECT_PASSWORD) {
+            if (enteredPassword === SYSTEM_PASSWORDS[selectedSystem]) {
                 loginScreen.style.display = 'none';
                 mainApp.style.display = 'block';
+                const label = selectedSystem === 'admin' ? "צוות ניהולי" : "משטרת ישראל";
+                systemTitle.innerText = `מערכת דיווח - ${label}`;
             } else {
                 loginError.style.display = 'block';
             }
         });
 
-        // מערכת הדיווח
+        // דיווחים
         const reportForm = document.getElementById('reportForm');
         const officerNameInput = document.getElementById('officerName');
         const reportDescriptionInput = document.getElementById('reportDescription');
         const reportsList = document.getElementById('reportsList');
         const loadingMessage = document.getElementById('loadingMessage');
 
-        // שליחת דוח
         reportForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const officerName = officerNameInput.value;
@@ -184,12 +197,10 @@
                 officerNameInput.value = '';
                 reportDescriptionInput.value = '';
             } catch (error) {
-                console.error("Error writing document: ", error);
                 alert("שגיאה בשליחת הדוח: " + error.message);
             }
         });
 
-        // הצגת דוחות בזמן אמת
         db.collection('reports').orderBy('timestamp', 'desc').onSnapshot((snapshot) => {
             reportsList.innerHTML = '<h2>דוחות קיימים</h2>';
             loadingMessage.style.display = 'none';
@@ -222,7 +233,6 @@
                 reportsList.appendChild(reportItem);
             });
         }, (error) => {
-            console.error("Error getting real-time updates: ", error);
             reportsList.innerHTML = '<p>שגיאה בטעינת הדוחות: ' + error.message + '</p>';
         });
     </script>
