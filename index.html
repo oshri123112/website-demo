@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>טאבלט משטרתי - מערכת דיווח</title>
+<style>
+  /* העיצוב זהה למה ששלחתי לך קודם - אפשר להעתיק כאן את אותו הקוד CSS */
+  @import url('https://fonts.googleapis.com/css2?family=Rubik&display=swap');
+  body {
+    margin: 0; padding: 0;
+    font-family: 'Rubik', sans-serif;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #eee;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  #tabletScreen {
+    background: #142833;
+    width: 90vw;
+    max-width: 900px;
+    height: 90vh;
+    border-radius: 18px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    padding: 15px 25px;
+    background: #0d2538;
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #61dafb;
+    font-weight: 700;
+    font-size: 20px;
+  }
+  header .user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+    font-size: 16px;
+    color: #cfd8dc;
+  }
+  header .user-icon {
+    width: 28px;
+    height: 28px;
+    fill: #61dafb;
+  }
+  nav {
+    display: flex;
+    background: #0d2538;
+    padding: 10px 15px;
+    justify-content: space-around;
+    border-bottom: 2px solid #61dafb;
+  }
+  nav button {
+    background: transparent;
+    border: none;
+    color: #9bb7c0;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 12px 18px;
+    border-radius: 12px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  nav button.active,
+  nav button:hover {
+    background: #61dafb;
+    color: #142833;
+    box-shadow: 0 4px 12px rgba(97,218,251,0.7);
+  }
+  main {
+    flex: 1;
+    padding: 20px 30px;
+    overflow-y: auto;
+    background: #0d2538;
+    border-bottom-left-radius: 18px;
+    border-bottom-right-radius: 18px;
+    color: #ddd;
+  }
+  main section {
+    display: none;
+  }
+  main section.active {
+    display: block;
+  }
+  main section h2 {
+    margin-top: 0;
+    color: #61dafb;
+    font-weight: 700;
+    margin-bottom: 15px;
+    font-size: 22px;
+  }
+  form {
+    margin-bottom: 20px;
+  }
+  input[type="text"], textarea {
+    width: 100%;
+    padding: 10px 15px;
+    margin: 10px 0 15px 0;
+    border-radius: 10px;
+    border: none;
+    font-size: 16px;
+    background: #0f344f;
+    color: #eee;
+    box-shadow: inset 0 0 8px #153a5a;
+    resize: vertical;
+  }
+  input[type="text"]:focus, textarea:focus {
+    outline: none;
+    box-shadow: 0 0 10px #61dafb;
+  }
+  textarea {
+    min-height: 90px;
+  }
+  button[type="submit"] {
+    background: #61dafb;
+    border: none;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 18px;
+    color: #142833;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  button[type="submit"]:hover {
+    background: #21a1f1;
+  }
+
+  .list-container {
+    max-height: 280px;
+    overflow-y: auto;
+    background: #0f344f;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: inset 0 0 15px #153a5a;
+  }
+  .list-item {
+    background: #142833;
+    margin-bottom: 10px;
+    padding: 12px 15px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    font-size: 15px;
+    line-height: 1.4;
+  }
+  .list-item strong {
+    color: #61dafb;
+  }
+  .timestamp {
+    font-size: 12px;
+    color: #78909c;
+    margin-top: 6px;
+  }
+
+  /* Scrollbar */
+  .list-container::-webkit-scrollbar {
+    width: 8px;
+  }
+  .list-container::-webkit-scrollbar-track {
+    background: #0d2538;
+    border-radius: 10px;
+  }
+  .list-container::-webkit-scrollbar-thumb {
+    background: #61dafb;
+    border-radius: 10px;
+  }
+</style>
+</head>
+<body>
+
+<div id="tabletScreen" role="main" aria-label="טאבלט משטרתי">
+
+  <header>
+    <div class="logo" aria-label="לוגו מערכת">טאבלט משטרתי</div>
+    <div class="user-profile" aria-live="polite" aria-atomic="true">
+      <svg class="user-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="7" r="4" />
+        <path d="M5 21c0-3.5 7-3.5 7-3.5S19 17.5 19 21" />
+      </svg>
+      <span id="loggedInUser"></span>
+      <button id="logoutBtn" style="margin-left:15px; background:#f44336; border:none; border-radius:8px; color:#fff; font-weight:700; padding:6px 12px; cursor:pointer;">יציאה</button>
+    </div>
+  </header>
+
+  <nav role="navigation" aria-label="תפריט ניווט">
+    <button class="active" data-target="registration" aria-controls="registration" aria-selected="true" role="tab">רישום</button>
+    <button data-target="chase" aria-controls="chase" aria-selected="false" role="tab">רדיפה</button>
+    <button data-target="backup" aria-controls="backup" aria-selected="false" role="tab">גיבוי</button>
+    <button data-target="search" aria-controls="search" aria-selected="false" role="tab">בדיקה</button>
+    <button data-target="report" aria-controls="report" aria-selected="false" role="tab">דוח</button>
+  </nav>
+
+  <main>
+    <section id="registration" class="tab active" role="tabpanel" tabindex="0" aria-labelledby="registration-tab">
+      <h2>רישום</h2>
+      <form id="registrationForm">
+        <input type="text" name="name" placeholder="שם מלא" required aria-label="שם מלא" />
+        <input type="text" name="unit" placeholder="יחידה" required aria-label="יחידה" />
+        <button type="submit">שלח רישום</button>
+      </form>
+      <div class="list-container" id="registrationList" aria-live="polite" aria-relevant="additions"></div>
+    </section>
+
+    <section id="chase" class="tab" role="tabpanel" tabindex="0" aria-labelledby="chase-tab">
+      <h2>רדיפה</h2>
+      <form id="chaseForm">
+        <input type="text" name="suspect" placeholder="שם החשוד" required aria-label="שם החשוד" />
+        <input type="text" name="vehicle" placeholder="רכב החשוד" required aria-label="רכב החשוד" />
+        <button type="submit">דווח על רדיפה</button>
+      </form>
+      <div class="list-container" id="chaseList" aria-live="polite" aria-relevant="additions"></div>
+    </section>
+
+    <section id="backup" class="tab" role="tabpanel" tabindex="0" aria-labelledby="backup-tab">
+      <h2>גיבוי</h2>
+      <form id="backupForm">
+        <input type="text" name="location" placeholder="מיקום" required aria-label="מיקום" />
+        <input type="text" name="reason" placeholder="סיבה" required aria-label="סיבה" />
+        <button type="submit">בקש גיבוי</button>
+      </form>
+      <div class="list-container" id="backupList" aria-live="polite" aria-relevant="additions"></div>
+    </section>
+
+    <section id="search" class="tab" role="tabpanel" tabindex="0" aria-labelledby="search-tab">
+      <h2>בדיקת רישום</h2>
+      <form id="searchForm">
+        <input type="text" name="query" placeholder="מה לבדוק?" required aria-label="מה לבדוק?" />
+        <button type="submit">בדוק</button>
+      </form>
+      <div class="list-container" id="searchList" aria-live="polite" aria-relevant="additions"></div>
+    </section>
+
+    <section id="report" class="tab" role="tabpanel" tabindex="0" aria-labelledby="report-tab">
+      <h2>דוח</h2>
+      <form id="reportForm">
+        <textarea name="description" placeholder="פרטי הדוח" required aria-label="פרטי הדוח"></textarea>
+        <button type="submit">שלח דוח</button>
+      </form>
+      <div class="list-container" id="reportList" aria-live="polite" aria-relevant="additions"></div>
+    </section>
+  </main>
+</div>
+
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyAAADd1lL5cgTgTxQOC8VSrjLlIsDlRyIk",
+    authDomain: "policereportsystem-f23fd.firebaseapp.com",
+    projectId: "policereportsystem-f23fd",
+    storageBucket: "policereportsystem-f23fd.appspot.com",
+    messagingSenderId: "93022201022",
+    appId: "1:93022201022:web:b33be966dcac2ce8612aef"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  // הצג שם המשתמש
+  const loggedInUser = document.getElementById("loggedInUser");
+  const username = localStorage.getItem("loggedInUser");
+  if (!username) {
+    // אם אין שם משתמש, חזור למסך ההתחברות
+    window.location.href = "login.html";
+  } else {
+    loggedInUser.textContent = username;
+  }
+
+  // יציאה - מחיקת המשתמש וזום להתחברות
+  document.getElementById("logoutBtn").onclick = () => {
+    localStorage.removeItem("loggedInUser");
+    window.location.href = "login.html";
+  };
+
+  // ניווט בין הטאבים
+  const navBtns = document.querySelectorAll("nav button");
+  const tabs = document.querySelectorAll("main section.tab");
+
+  navBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      navBtns.forEach(b => {
+        b.classList.remove("active");
+        b.setAttribute("aria-selected", "false");
+      });
+      btn.classList.add("active");
+      btn.setAttribute("aria-selected", "true");
+
+      const target = btn.getAttribute("data-target");
+      tabs.forEach(tab => {
+        tab.classList.toggle("active", tab.id === target);
+      });
+    });
+  });
+
+  // פונקציית שליחת טופס
+  function submitForm(event, collection) {
+    event.preventDefault();
+    const form = event.target;
+    const data = {};
+    Array.from(form.elements).forEach(el => {
+      if (el.name) data[el.name] = el.value.trim();
+    });
+    data.timestamp = firebase.firestore.FieldValue.serverTimestamp();
+    db.collection(collection).add(data).then(() => {
+      form.reset();
+    }).catch(err => alert("שגיאה בשליחת הנתונים: " + err.message));
+  }
+
+  // חיבור האירועים לטפסים
+  document.getElementById("registrationForm").addEventListener("submit", e => submitForm(e, "registration"));
+  document.getElementById("chaseForm").addEventListener("submit", e => submitForm(e, "chases"));
+  document.getElementById("backupForm").addEventListener("submit", e => submitForm(e, "backups"));
+  document.getElementById("searchForm").addEventListener("submit", e => submitForm(e, "searches"));
+  document.getElementById("reportForm").addEventListener("submit", e => submitForm(e, "reports"));
+
+  // הצגת הרשימות בזמן אמת
+  function renderList(collectionName, containerId, formatFn) {
+    const container = document.getElementById(containerId);
+    db.collection(collectionName).orderBy("timestamp", "desc").onSnapshot(snapshot => {
+      container.innerHTML = "";
+      if (snapshot.empty) {
+        container.innerHTML = "<p>אין פריטים להצגה כרגע.</p>";
+        return;
+      }
+      snapshot.forEach(doc => {
+        const d = doc.data();
+        const ts = d.timestamp ? d.timestamp.toDate().toLocaleString("he-IL") : "---";
+        const div = document.createElement("div");
+        div.className = "list-item";
+        div.innerHTML = formatFn(d, ts);
+        container.appendChild(div);
+      });
+    });
+  }
+
+  renderList("registration", "registrationList", (d, ts) => 
+    `<strong>שם:</strong> ${d.name} | <strong>יחידה:</strong> ${d.unit}<div class="timestamp">${ts}</div>`
+  );
+  renderList("chases", "chaseList", (d, ts) => 
+    `<strong>חשוד:</strong> ${d.suspect} | <strong>רכב:</strong> ${d.vehicle}<div class="timestamp">${ts}</div>`
+  );
+  renderList("backups", "backupList", (d, ts) => 
+    `<strong>מיקום:</strong> ${d.location} | <strong>סיבה:</strong> ${d.reason}<div class="timestamp">${ts}</div>`
+  );
+  renderList("searches", "searchList", (d, ts) => 
+    `<strong>חיפוש:</strong> ${d.query}<div class="timestamp">${ts}</div>`
+  );
+  renderList("reports", "reportList", (d, ts) => 
+    `<strong>דוח:</strong> ${d.description}<div class="timestamp">${ts}</div>`
+  );
+
+</script>
+
+</body>
+</html>
