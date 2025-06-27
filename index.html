@@ -3,287 +3,405 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>מערכת דיווח עם ניהול</title>
+<title>טאבלט משטרתי משודרג</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Heebo&display=swap');
   body {
-    font-family: Arial, sans-serif;
-    direction: rtl;
+    margin: 0; font-family: 'Heebo', Arial, sans-serif;
+    background: url('https://upload.wikimedia.org/wikipedia/commons/8/8c/Police_Israel_-_ISPU_-_flag.png') no-repeat center center fixed;
+    background-size: cover;
+    color: #eee; direction: rtl;
+  }
+  body::before {
+    content: '';
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(18,18,18,0.9);
+    backdrop-filter: blur(8px);
+    z-index: -1;
+  }
+  .app {
+    display: flex; height: 100vh; user-select:none;
+  }
+  .sidebar {
+    width: 220px; background: #1f1f1f; padding: 25px 20px;
+    box-shadow: inset -1px 0 0 #333;
+    display: flex; flex-direction: column; align-items: stretch;
+  }
+  .sidebar .logo {
+    height: 70px; margin-bottom: 25px;
+    background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Israel_Police_Force_Logo.svg/120px-Israel_Police_Force_Logo.svg.png') no-repeat center center;
+    background-size: contain;
+  }
+  .sidebar h2 {
+    color: #0af; margin: 0 0 35px 0; font-weight: 600; font-size: 26px;
+    user-select:none;
+  }
+  .sidebar button {
+    background: transparent;
+    border: none;
+    color: #ccc;
     text-align: right;
-    margin: 20px;
-    background-color: #f4f4f4;
-    color: #333;
+    padding: 14px 18px;
+    margin-bottom: 12px;
+    font-size: 18px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: flex-end;
+    gap: 10px;
+    transition: color 0.3s ease, background-color 0.3s ease;
+    border-radius: 6px;
   }
-  .container {
-    max-width: 800px;
-    margin: 0 auto 20px;
-    background: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  .sidebar button:hover {
+    background: #0a47b9;
+    color: #e0e8ff;
   }
-  h1, h2 {
-    color: #0056b3;
+  .sidebar button svg {
+    fill: currentColor;
+    width: 22px;
+    height: 22px;
   }
-  form {
-    margin-bottom: 20px;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background: #e9e9e9;
+  .main {
+    flex: 1; padding: 30px 25px; overflow-y: auto;
   }
-  label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
+  .login-screen, .main-content {
+    max-width: 720px; margin: auto;
   }
-  input[type="text"], input[type="password"], select, textarea {
-    width: calc(100% - 22px);
-    padding: 10px;
-    margin-bottom: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+  input, select, textarea, button {
+    width: 100%; padding: 14px; margin-top: 12px; margin-bottom: 22px;
+    border-radius: 6px; border: none; font-size: 17px;
     box-sizing: border-box;
+  }
+  input, select, textarea {
+    background: #222;
+    color: #eee;
+  }
+  button {
+    background-color: #0af;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background-color: #0872d9;
   }
   textarea {
     resize: vertical;
-    min-height: 80px;
+    min-height: 90px;
   }
-  button {
-    background-color: #007bff;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-  }
-  button:hover {
-    background-color: #0056b3;
-  }
-  .report-item {
-    background: #f9f9f9;
-    border: 1px solid #eee;
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 5px;
+  .report {
+    background: #282828;
+    padding: 18px;
+    margin-bottom: 15px;
+    border-radius: 8px;
     position: relative;
+    cursor: default;
   }
-  .report-item strong {
-    color: #333;
+  .report:hover {
+    background: #333;
   }
-  .report-item p {
-    margin: 5px 0;
-    line-height: 1.5;
+  .report strong {
+    font-weight: 700;
   }
-  .report-timestamp {
-    font-size: 0.8em;
-    color: #777;
-    text-align: left;
+  .report .timestamp {
+    font-size: 13px;
+    color: #aaa;
+    margin-top: 6px;
+    user-select: none;
   }
   .delete-btn {
     position: absolute;
-    top: 10px;
-    left: 10px;
-    background: #dc3545;
+    left: 14px; top: 14px;
+    background: #d52b2b;
     border: none;
-    padding: 6px 10px;
-    color: white;
-    border-radius: 3px;
+    border-radius: 6px;
+    padding: 5px 11px;
     cursor: pointer;
+    color: white;
+    font-weight: 600;
     font-size: 14px;
+    transition: background-color 0.3s ease;
   }
   .delete-btn:hover {
-    background: #b52a37;
+    background: #a11f1f;
   }
   #loginError {
-    color: red;
+    color: #f44;
+    margin-top: -10px;
+    margin-bottom: 20px;
     display: none;
+    font-weight: 600;
+  }
+  .header-user {
+    font-weight: 600;
+    font-size: 20px;
+    margin-bottom: 35px;
+    user-select:none;
+  }
+  #reportCount {
+    margin-bottom: 25px;
+    font-size: 17px;
+    font-weight: 600;
+    color: #66aaff;
+    user-select:none;
+  }
+  #filterInput {
+    background: #222;
+    color: #eee;
+    padding: 10px 15px;
+    border-radius: 6px;
+    font-size: 15px;
+    margin-bottom: 30px;
+    box-sizing: border-box;
+    border: none;
+  }
+  .fade {
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+  .fade.show {
+    opacity: 1;
   }
 </style>
 </head>
 <body>
 
-<!-- מסך התחברות -->
-<div id="loginScreen" class="container">
-  <h1>התחברות למערכת</h1>
-  <form id="loginForm">
-    <label for="system">בחר מערכת:</label>
-    <select id="system" required>
-      <option value="" disabled selected>בחר</option>
-      <option value="police">משטרת ישראל</option>
-      <option value="admin">צוות ניהולי</option>
-    </select>
+<div class="app">
+  <nav class="sidebar" aria-label="תפריט ניווט">
+    <div class="logo" role="img" aria-label="לוגו משטרת ישראל"></div>
+    <h2>משטרת ישראל</h2>
+    <button id="btnReport" aria-controls="reportForm" aria-expanded="true" onclick="showSection('reportForm')">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 17.25V21h3.75l11.06-11.06-3.75-3.75L3 17.25zM21.41 6.34a1 1 0 000-1.41l-2.34-2.34a1 1 0 00-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+      דיווח חדש
+    </button>
+    <button id="btnReports" aria-controls="reports" aria-expanded="false" onclick="showSection('reports')">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zm0-8h14V7H7v2z"/></svg>
+      דוחות קיימים
+    </button>
+    <button id="btnLogout" onclick="logout()">
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M16 13v-2H7V8l-5 4 5 4v-3zM20 3h-7v2h7v14h-7v2h7a2 2 0 002-2V5a2 2 0 00-2-2z"/></svg>
+      התנתק
+    </button>
+  </nav>
 
-    <label for="password">הזן סיסמה:</label>
-    <input type="password" id="password" required />
+  <main class="main" role="main">
+    <section id="loginScreen" class="login-screen" aria-label="מסך התחברות">
+      <h2>התחברות למערכת</h2>
+      <select id="system" aria-label="בחר מערכת" required>
+        <option value="" disabled selected>בחר מערכת</option>
+        <option value="police">שוטר</option>
+        <option value="admin">ניהולי</option>
+      </select>
+      <input id="password" type="password" aria-label="סיסמה" placeholder="סיסמה" required />
+      <button id="loginBtn" onclick="login()">התחבר</button>
+      <p id="loginError" role="alert" aria-live="assertive">סיסמה לא נכונה</p>
+    </section>
 
-    <button type="submit">התחבר</button>
-    <p id="loginError">סיסמה שגויה או מערכת שגויה</p>
-  </form>
+    <section id="mainContent" class="main-content fade" style="display:none;" aria-live="polite" aria-label="מערכת דיווח">
+      <div class="header-user" id="headerUser">שלום, שוטר</div>
+      <div id="reportCount">מספר דוחות נשלחו: 0</div>
+
+      <div id="reportForm">
+        <h2>שליחת דוח חדש</h2>
+        <select id="reportType" aria-label="סוג דוח">
+          <option value="דיווח רגיל" selected>דיווח רגיל</option>
+          <option value="רדיפה">רדיפה</option>
+          <option value="קריאה">קריאה</option>
+        </select>
+        <input id="officerName" type="text" placeholder="שם השוטר" aria-label="שם השוטר" required />
+        <textarea id="reportDescription" placeholder="תיאור הדוח" aria-label="תיאור הדוח" required></textarea>
+        <button onclick="submitReport()">שלח דוח</button>
+      </div>
+
+      <div id="reports" style="display:none;">
+        <input type="text" id="filterInput" placeholder="סינון דוחות לפי שם שוטר..." aria-label="סינון דוחות לפי שם שוטר" />
+        <div id="reportsList" tabindex="0" aria-live="polite">טוען דוחות...</div>
+      </div>
+    </section>
+  </main>
 </div>
 
-<!-- מערכת דיווח -->
-<div id="mainApp" class="container" style="display:none;">
-  <h1 id="systemTitle">מערכת דיווח</h1>
-
-  <form id="reportForm">
-    <h2>הוספת דוח חדש</h2>
-    <label for="officerName">שם שוטר:</label>
-    <input type="text" id="officerName" required />
-
-    <label for="reportDescription">תיאור הדוח:</label>
-    <textarea id="reportDescription" required></textarea>
-
-    <button type="submit">שליחת דוח</button>
-  </form>
-
-  <div id="reportsList">
-    <h2>דוחות קיימים</h2>
-    <p id="loadingMessage">טוען דוחות...</p>
-  </div>
-</div>
-
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
 <script>
-  // קונפיגורציית Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyAAADd1lL5cgTgTxQOC8VSrjLlIsDlRyIk",
     authDomain: "policereportsystem-f23fd.firebaseapp.com",
     projectId: "policereportsystem-f23fd",
     storageBucket: "policereportsystem-f23fd.appspot.com",
     messagingSenderId: "93022201022",
-    appId: "1:93022201022:web:b33be966dcac2ce8612aef",
-    measurementId: "G-312TDJBX4T"
+    appId: "1:93022201022:web:b33be966dcac2ce8612aef"
   };
   firebase.initializeApp(firebaseConfig);
   const db = firebase.firestore();
 
-  // אלמנטים התחברות
-  const loginScreen = document.getElementById('loginScreen');
-  const mainApp = document.getElementById('mainApp');
-  const loginForm = document.getElementById('loginForm');
-  const passwordInput = document.getElementById('password');
-  const systemSelect = document.getElementById('system');
-  const loginError = document.getElementById('loginError');
-  const systemTitle = document.getElementById('systemTitle');
-
-  const SYSTEM_PASSWORDS = {
-    police: "police123",
-    admin: "admin321"
-  };
-
-  // משתנה גלובלי למערכת המחוברת
   let currentSystem = null;
+  let currentUserName = '';
 
-  loginForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const selectedSystem = systemSelect.value;
-    const enteredPassword = passwordInput.value;
+  const loginError = document.getElementById('loginError');
+  const loginScreen = document.getElementById('loginScreen');
+  const mainContent = document.getElementById('mainContent');
+  const headerUser = document.getElementById('headerUser');
+  const reportCount = document.getElementById('reportCount');
+  const reportsList = document.getElementById('reportsList');
+  const filterInput = document.getElementById('filterInput');
 
-    if (enteredPassword === SYSTEM_PASSWORDS[selectedSystem]) {
+  function login() {
+    const system = document.getElementById('system').value;
+    const pass = document.getElementById('password').value;
+    const passwords = { police: 'police123', admin: 'admin321' };
+    if (pass === passwords[system]) {
+      currentSystem = system;
       loginError.style.display = 'none';
-      currentSystem = selectedSystem;
       loginScreen.style.display = 'none';
-      mainApp.style.display = 'block';
-
-      const label = selectedSystem === 'admin' ? "צוות ניהולי" : "משטרת ישראל";
-      systemTitle.innerText = `מערכת דיווח - ${label}`;
-
-      // טען דוחות מחדש אחרי התחברות כדי לעדכן כפתורי מחיקה לפי סוג המשתמש
+      mainContent.style.display = 'block';
+      mainContent.classList.add('show');
+      currentUserName = '';
+      headerUser.textContent = `שלום, ${system === 'admin' ? 'צוות ניהולי' : 'שוטר'}`;
+      document.getElementById('officerName').value = '';
+      document.getElementById('reportDescription').value = '';
       loadReports();
+      showSection('reportForm');
     } else {
       loginError.style.display = 'block';
     }
-  });
+  }
 
-  // אלמנטים מערכת דיווח
-  const reportForm = document.getElementById('reportForm');
-  const officerNameInput = document.getElementById('officerName');
-  const reportDescriptionInput = document.getElementById('reportDescription');
-  const reportsList = document.getElementById('reportsList');
-  const loadingMessage = document.getElementById('loadingMessage');
+  function logout() {
+    currentSystem = null;
+    currentUserName = '';
+    loginScreen.style.display = 'block';
+    mainContent.style.display = 'none';
+    document.getElementById('password').value = '';
+    document.getElementById('system').value = '';
+    reportsList.innerHTML = '';
+    reportCount.textContent = 'מספר דוחות נשלחו: 0';
+  }
 
-  // שליחת דוח חדש
-  reportForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const officerName = officerNameInput.value;
-    const reportDescription = reportDescriptionInput.value;
-    const timestamp = firebase.firestore.FieldValue.serverTimestamp();
+  function showSection(id) {
+    document.getElementById('reportForm').style.display = 'none';
+    document.getElementById('reports').style.display = 'none';
+    document.getElementById(id).style.display = 'block';
 
+    // עדכון aria-expanded בכפתורים
+    document.getElementById('btnReport').setAttribute('aria-expanded', id === 'reportForm');
+    document.getElementById('btnReports').setAttribute('aria-expanded', id === 'reports');
+  }
+
+  async function submitReport() {
+    const officer = document.getElementById('officerName').value.trim();
+    const description = document.getElementById('reportDescription').value.trim();
+    const reportType = document.getElementById('reportType').value;
+    if (!officer || !description) {
+      alert('נא למלא את כל השדות');
+      return;
+    }
     try {
       await db.collection('reports').add({
-        officerName,
-        description: reportDescription,
-        timestamp
+        officerName: officer,
+        description,
+        reportType,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
       });
-      officerNameInput.value = '';
-      reportDescriptionInput.value = '';
-    } catch (error) {
-      alert("שגיאה בשליחת הדוח: " + error.message);
+      document.getElementById('officerName').value = '';
+      document.getElementById('reportDescription').value = '';
+      currentUserName = officer;
+      headerUser.textContent = `שלום, ${officer}`;
+      alert('הדוח נשלח בהצלחה!');
+      loadReports();
+      showSection('reports');
+    } catch (e) {
+      alert('שגיאה בשליחה: ' + e.message);
     }
-  });
+  }
 
-  // פונקציה לטעינת דוחות ולהצגת כפתורי מחיקה בהתאם למערכת המחוברת
+  let unsubscribeReports = null;
   function loadReports() {
-    reportsList.innerHTML = '<h2>דוחות קיימים</h2><p id="loadingMessage">טוען דוחות...</p>';
-    const unsubscribe = db.collection('reports').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
-      reportsList.innerHTML = '<h2>דוחות קיימים</h2>';
+    if (unsubscribeReports) unsubscribeReports();
 
+    unsubscribeReports = db.collection('reports').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
+      let reportsArray = [];
+      reportsList.innerHTML = '';
       if (snapshot.empty) {
-        reportsList.innerHTML += '<p>אין דוחות להצגה כרגע.</p>';
+        reportsList.innerHTML = '<p>אין דוחות כרגע.</p>';
+        reportCount.textContent = 'מספר דוחות נשלחו: 0';
         return;
       }
-
       snapshot.forEach(doc => {
-        const report = doc.data();
-        const reportId = doc.id;
-        const reportItem = document.createElement('div');
-        reportItem.classList.add('report-item');
-
-        let timestampText = '';
-        if (report.timestamp) {
-          const date = report.timestamp.toDate();
-          timestampText = new Date(date).toLocaleString('he-IL', {
-            year: 'numeric', month: 'numeric', day: 'numeric',
-            hour: 'numeric', minute: 'numeric', second: 'numeric',
-            hour12: false
-          });
-        }
-
-        reportItem.innerHTML = `
-          <p><strong>שוטר:</strong> ${report.officerName}</p>
-          <p><strong>דוח:</strong> ${report.description}</p>
-          <p class="report-timestamp">${timestampText}</p>
-        `;
-
-        // כפתור מחיקה רק לצוות ניהולי
-        if (currentSystem === 'admin') {
-          const deleteBtn = document.createElement('button');
-          deleteBtn.className = 'delete-btn';
-          deleteBtn.textContent = 'מחק דוח';
-          deleteBtn.onclick = async () => {
-            if (confirm('למחוק דוח זה?')) {
-              try {
-                await db.collection('reports').doc(reportId).delete();
-              } catch (error) {
-                alert('שגיאה במחיקת הדוח: ' + error.message);
-              }
-            }
-          };
-          reportItem.appendChild(deleteBtn);
-        }
-
-        reportsList.appendChild(reportItem);
+        reportsArray.push({ id: doc.id, data: doc.data() });
       });
+      reportCount.textContent = `מספר דוחות נשלחו: ${reportsArray.length}`;
+      displayReports(reportsArray);
     }, error => {
       reportsList.innerHTML = `<p>שגיאה בטעינת הדוחות: ${error.message}</p>`;
     });
   }
 
-  // לא טוען דוחות מראש, אלא רק אחרי התחברות מוצלחת
+  function displayReports(reports) {
+    const filterVal = filterInput.value.trim().toLowerCase();
+    reportsList.innerHTML = '';
+    let filtered = reports.filter(r => r.data.officerName.toLowerCase().includes(filterVal));
+
+    if (filtered.length === 0) {
+      reportsList.innerHTML = '<p>לא נמצאו דוחות לפי סינון זה.</p>';
+      return;
+    }
+
+    filtered.forEach(r => {
+      const d = r.data;
+      const div = document.createElement('div');
+      div.className = 'report';
+      let dateStr = '';
+      if (d.timestamp) {
+        dateStr = d.timestamp.toDate().toLocaleString('he-IL');
+      }
+      div.innerHTML = `
+        <strong>שוטר:</strong> ${d.officerName}<br/>
+        <strong>סוג דוח:</strong> ${d.reportType}<br/>
+        <strong>תיאור:</strong> <span class="desc" title="העתק ללחיצה">${escapeHtml(d.description)}</span><br/>
+        <span class="timestamp">${dateStr}</span>
+      `;
+
+      if (currentSystem === 'admin') {
+        const del = document.createElement('button');
+        del.className = 'delete-btn';
+        del.textContent = 'מחק';
+        del.onclick = () => {
+          if (confirm('אתה בטוח שברצונך למחוק דוח זה?')) {
+            db.collection('reports').doc(r.id).delete();
+          }
+        };
+        div.appendChild(del);
+      }
+
+      // העתקת תיאור בלחיצה
+      const descSpan = div.querySelector('.desc');
+      descSpan.style.cursor = 'pointer';
+      descSpan.onclick = () => {
+        navigator.clipboard.writeText(d.description);
+        alert('תיאור הדוח הועתק!');
+      };
+
+      reportsList.appendChild(div);
+    });
+  }
+
+  filterInput.addEventListener('input', () => {
+    if (!unsubscribeReports) return;
+    // שוב טוען מהפונקציה שנשמרה
+    db.collection('reports').orderBy('timestamp', 'desc').get().then(snapshot => {
+      let arr = [];
+      snapshot.forEach(doc => arr.push({ id: doc.id, data: doc.data() }));
+      displayReports(arr);
+    });
+  });
+
+  function escapeHtml(text) {
+    return text.replace(/[&<>"']/g, function(m) {
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];
+    });
+  }
 </script>
+
 </body>
 </html>
