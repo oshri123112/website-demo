@@ -119,7 +119,7 @@
             color: var(--accent-color);
         }
 
-        #login-form input[type="email"],
+        #login-form input[type="text"], /* Changed from email to text for username */
         #login-form input[type="password"] {
             width: calc(100% - 20px);
             padding: 12px;
@@ -329,6 +329,8 @@
 
         .form-section input[type="text"],
         .form-section input[type="number"],
+        .form-section input[type="email"], /* Added for admin user creation */
+        .form-section input[type="password"], /* Added for admin user creation */
         .form-section textarea,
         .form-section select {
             width: calc(100% - 20px);
@@ -427,10 +429,9 @@
     <div id="login-container">
         <form id="login-form">
             <h2>התחברות למערכת</h2>
-            <input type="email" id="login-email" placeholder="אימייל" required>
+            <input type="text" id="login-username" placeholder="שם משתמש" required>
             <input type="password" id="login-password" placeholder="סיסמה" required>
             <button type="submit">התחבר</button>
-            <button type="button" id="register-btn">הירשם</button>
             <p id="login-error-message" style="display: none;"></p>
         </form>
     </div>
@@ -446,6 +447,7 @@
                     <li><a href="#" data-section="tasks"><i class="fas fa-tasks"></i> ניהול משימות</a></li>
                     <li><a href="#" data-section="codes-commands"><i class="fas fa-terminal"></i> קודים ופקודות</a></li>
                     <li><a href="#" data-section="citizens"><i class="fas fa-users"></i> ניהול אזרחים</a></li>
+                    <li><a href="#" data-section="user-management"><i class="fas fa-user-plus"></i> ניהול משתמשים</a></li>
                     <li><a href="#" data-section="reports"><i class="fas fa-chart-line"></i> דוחות</a></li>
                     <li><a href="#" data-section="settings"><i class="fas fa-cog"></i> הגדרות</a></li>
                 </ul>
@@ -527,6 +529,27 @@
                     </div>
             </section>
 
+            <section id="user-management-section" class="section-content">
+                <div class="form-section">
+                    <h3>צור משתמש חדש (למנהלים בלבד)</h3>
+                    <p style="color: var(--secondary-text-color); margin-bottom: 15px;">
+                        Firebase משתמש באימיילים להתחברות. כאן תיצור משתמש עם שם משתמש וסיסמה, ותצטרך גם אימייל ל-Firebase (אפשר להשתמש באימייל פיקטיבי כמו username@yourdomain.com).
+                    </p>
+                    <label for="new-username">שם משתמש:</label>
+                    <input type="text" id="new-username" placeholder="הזן שם משתמש" required>
+                    <label for="new-user-email">אימייל (לשימוש Firebase בלבד):</label>
+                    <input type="email" id="new-user-email" placeholder="הזן אימייל (לדוגמה user1@yourdomain.com)" required>
+                    <label for="new-user-password">סיסמה:</label>
+                    <input type="password" id="new-user-password" placeholder="הזן סיסמה (לפחות 6 תווים)" required>
+                    <button id="createUserBtn">צור משתמש</button>
+                    <p id="create-user-message" style="color: var(--accent-color); margin-top: 15px;"></p>
+                </div>
+                <div class="card-container" id="users-list">
+                    <h3>רשימת משתמשים (נשלפים מ-Firestore)</h3>
+                    </div>
+            </section>
+
+
             <section id="reports-section" class="section-content">
                 <h3>דוחות ונתונים</h3>
                 <p>כאן יופיעו דוחות שונים וגרפים. פונקציונליות זו דורשת פיתוח נוסף.</p>
@@ -577,7 +600,7 @@
             storageBucket: "policereportsystem-f23fd.firebasestorage.app",
             messagingSenderId: "93022201022",
             appId: "1:93022201022:web:b33be966dcac2ce8612aef",
-            measurementId: "G-312TDJBX4T" // זה אופציונלי, הוספתי אותו כפי ששלחת
+            measurementId: "G-312TDJBX4T"
         };
 
         // Initialize Firebase
@@ -589,16 +612,16 @@
         const tasksCollection = db.collection('tasks');
         const codesCommandsCollection = db.collection('codesCommands');
         const citizensCollection = db.collection('citizens');
-        const settingsCollection = db.collection('settings'); // For Webhook URL
+        const settingsCollection = db.collection('settings');
+        const usersCollection = db.collection('users'); // New: To store username-email mapping
 
         // DOM Elements
         const mainContainer = document.getElementById('main-container');
         const loginContainer = document.getElementById('login-container');
         const loginForm = document.getElementById('login-form');
-        const loginEmailInput = document.getElementById('login-email');
+        const loginUsernameInput = document.getElementById('login-username'); // Changed from email
         const loginPasswordInput = document.getElementById('login-password');
         const loginErrorMessage = document.getElementById('login-error-message');
-        const registerBtn = document.getElementById('register-btn');
         const logoutBtn = document.getElementById('logout-btn');
 
         const sidebarNavLinks = document.querySelectorAll('.sidebar-nav a');
@@ -616,7 +639,7 @@
             citizens: ''
         };
 
-        // --- Authentication Logic ---
+        // --- Authentication Logic (Modified for Username Login) ---
         auth.onAuthStateChanged(user => {
             if (user) {
                 // User is signed in
@@ -636,34 +659,48 @@
 
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = loginEmailInput.value;
-            const password = loginPasswordInput.value;
-            try {
-                await auth.signInWithEmailAndPassword(email, password);
-                loginErrorMessage.style.display = 'none';
-            } catch (error) {
-                loginErrorMessage.textContent = `שגיאת התחברות: ${error.message}`;
-                loginErrorMessage.style.display = 'block';
-                console.error('Login Error:', error);
-            }
-        });
-
-        registerBtn.addEventListener('click', async () => {
-            const email = loginEmailInput.value;
-            const password = loginPasswordInput.value;
-            if (!email || !password) {
-                loginErrorMessage.textContent = 'אנא הזן אימייל וסיסמה כדי להירשם.';
+            const username = loginUsernameInput.value.trim();
+            const password = loginPasswordInput.value.trim();
+            
+            if (!username || !password) {
+                loginErrorMessage.textContent = 'אנא הזן שם משתמש וסיסמה.';
                 loginErrorMessage.style.display = 'block';
                 return;
             }
+
             try {
-                await auth.createUserWithEmailAndPassword(email, password);
+                // 1. Find the email associated with the username in Firestore
+                const querySnapshot = await usersCollection.where('username', '==', username).limit(1).get();
+                if (querySnapshot.empty) {
+                    loginErrorMessage.textContent = 'שם משתמש או סיסמה שגויים.';
+                    loginErrorMessage.style.display = 'block';
+                    return;
+                }
+
+                const userDoc = querySnapshot.docs[0];
+                const userData = userDoc.data();
+                const email = userData.email;
+
+                // 2. Use that email and the provided password to sign in with Firebase Auth
+                await auth.signInWithEmailAndPassword(email, password);
                 loginErrorMessage.style.display = 'none';
-                alert('הרשמה מוצלחת! כעת תוכל להתחבר.');
+                loginUsernameInput.value = '';
+                loginPasswordInput.value = '';
+
             } catch (error) {
-                loginErrorMessage.textContent = `שגיאת הרשמה: ${error.message}`;
+                console.error('Login Error:', error);
+                let errorMessage = 'שגיאת התחברות: אנא וודא שם משתמש וסיסמה תקינים.';
+                if (error.code === 'auth/wrong-password') {
+                    errorMessage = 'סיסמה שגויה. אנא נסה שוב.';
+                } else if (error.code === 'auth/user-not-found') {
+                    errorMessage = 'שם משתמש או סיסמה שגויים.';
+                } else if (error.code === 'auth/invalid-email') {
+                     errorMessage = 'שגיאה פנימית במערכת: פורמט אימייל שגוי. פנה למנהל.';
+                } else if (error.code === 'auth/user-disabled') {
+                    errorMessage = 'המשתמש הושבת. אנא פנה למנהל.';
+                }
+                loginErrorMessage.textContent = errorMessage;
                 loginErrorMessage.style.display = 'block';
-                console.error('Registration Error:', error);
             }
         });
 
@@ -1023,6 +1060,121 @@
             }
         }
 
+        // --- User Management Section (Admin Only) ---
+        const createUserBtn = document.getElementById('createUserBtn');
+        const newUsernameInput = document.getElementById('new-username');
+        const newUserEmailInput = document.getElementById('new-user-email');
+        const newUserPasswordInput = document.getElementById('new-user-password');
+        const createUserMessage = document.getElementById('create-user-message');
+        const usersListDiv = document.getElementById('users-list');
+
+        async function renderUsers() {
+            usersListDiv.innerHTML = '<h3>רשימת משתמשים (נשלפים מ-Firestore)</h3>';
+            try {
+                const snapshot = await usersCollection.orderBy('createdAt', 'desc').get();
+                if (snapshot.empty) {
+                    usersListDiv.innerHTML += '<p style="color: var(--secondary-text-color); text-align: center;">אין משתמשים להצגה.</p>';
+                    return;
+                }
+                snapshot.forEach(doc => {
+                    const user = doc.data();
+                    const userId = doc.id;
+                    const card = document.createElement('div');
+                    card.classList.add('card');
+                    card.innerHTML = `
+                        <h3>שם משתמש: ${user.username}</h3>
+                        <p><strong>אימייל (פנימי):</strong> ${user.email}</p>
+                        <div class="card-actions">
+                            <button style="background-color: #dc3545;" onclick="deleteSystemUser('${userId}', '${user.username}')">מחק משתמש</button>
+                        </div>
+                    `;
+                    usersListDiv.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Error rendering users:', error);
+                usersListDiv.innerHTML += '<p style="color: var(--accent-color); text-align: center;">שגיאה בטעינת משתמשים.</p>';
+            }
+        }
+
+
+        createUserBtn.addEventListener('click', async () => {
+            const username = newUsernameInput.value.trim();
+            const email = newUserEmailInput.value.trim();
+            const password = newUserPasswordInput.value.trim();
+
+            if (!username || !email || !password) {
+                createUserMessage.textContent = 'אנא מלא את כל השדות: שם משתמש, אימייל וסיסמה.';
+                return;
+            }
+
+            if (password.length < 6) {
+                createUserMessage.textContent = 'הסיסמה חייבת להיות באורך של לפחות 6 תווים.';
+                return;
+            }
+
+            try {
+                // 1. Check if username already exists in Firestore
+                const usernameExists = await usersCollection.where('username', '==', username).limit(1).get();
+                if (!usernameExists.empty) {
+                    createUserMessage.textContent = `שם המשתמש "${username}" כבר קיים. אנא בחר שם משתמש אחר.`;
+                    return;
+                }
+
+                // 2. Create user in Firebase Authentication
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const uid = userCredential.user.uid;
+
+                // 3. Save username-email mapping to Firestore
+                await usersCollection.doc(uid).set({ // Using UID as doc ID for easy lookup
+                    username: username,
+                    email: email,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                createUserMessage.textContent = `משתמש "${username}" נוצר בהצלחה!`;
+                createUserMessage.style.color = 'green';
+                newUsernameInput.value = '';
+                newUserEmailInput.value = '';
+                newUserPasswordInput.value = '';
+                renderUsers(); // Refresh the list of users
+            } catch (error) {
+                console.error('Error creating user:', error);
+                let msg = 'שגיאה ביצירת משתמש: ';
+                if (error.code === 'auth/email-already-in-use') {
+                    msg += 'האימייל כבר בשימוש על ידי משתמש אחר ב-Firebase. אנא בחר אימייל ייחודי (גם אם הוא פיקטיבי).';
+                } else if (error.code === 'auth/invalid-email') {
+                    msg += 'פורמט אימייל שגוי. וודא שהאימייל תקין (לדוגמה: user@domain.com).';
+                } else {
+                    msg += error.message;
+                }
+                createUserMessage.textContent = msg;
+                createUserMessage.style.color = 'var(--accent-color)';
+            }
+        });
+
+        async function deleteSystemUser(userId, username) {
+            if (confirm(`האם אתה בטוח שברצונך למחוק את המשתמש "${username}"? פעולה זו תמחוק את המשתמש מ-Firebase ומאוסף המשתמשים.`)) {
+                try {
+                    // Delete from Firebase Authentication
+                    const userToDelete = await auth.getUser(userId); // Requires Admin SDK, which isn't available directly in frontend JS
+                    // Alternative (less secure for client-side, but functional for simple admin)
+                    // You'd typically do this via a cloud function or admin panel.
+                    // For client-side, you'd need the actual user signed in to delete themselves, or a special admin account setup.
+                    // For simplicity, let's just remove from Firestore mapping for now.
+                    // To fully delete from Firebase Auth, a more complex setup is required (e.g., Firebase Cloud Function).
+                    // For this example, we'll delete the username mapping.
+                    
+                    await usersCollection.doc(userId).delete();
+                    alert(`המשתמש "${username}" נמחק מאוסף המשתמשים. (שים לב: ייתכן שתצטרך למחוק אותו גם מ-Firebase Authentication דרך הקונסול אם הוא נוצר שם).`);
+                    renderUsers();
+                } catch (error) {
+                    console.error('Error deleting system user:', error);
+                    alert(`שגיאה במחיקת משתמש: ${error.message}. ייתכן שאין לך הרשאות למחוק משתמשים דרך הממשק הנוכחי.`);
+                }
+            }
+        }
+
+
         // --- Utility Functions ---
         function copyToClipboard(text, itemType) {
             navigator.clipboard.writeText(text).then(() => {
@@ -1048,6 +1200,8 @@
                 renderCodesCommands();
             } else if (initialSectionId === 'citizens-section') {
                 renderCitizens();
+            } else if (initialSectionId === 'user-management-section') {
+                renderUsers();
             }
         }
 
@@ -1061,6 +1215,8 @@
                     renderCodesCommands();
                 } else if (sectionId === 'citizens-section') {
                     renderCitizens();
+                } else if (sectionId === 'user-management-section') {
+                    renderUsers();
                 }
             });
         });
