@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>התחברות למערכת המשטרתית</title>
+<style>
+  body {
+    margin: 0; padding: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #eee;
+  }
+  .login-box {
+    background: #142833;
+    padding: 40px 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+    width: 320px;
+    text-align: center;
+  }
+  .login-box h1 {
+    margin-bottom: 30px;
+    color: #61dafb;
+  }
+  .login-box input {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    border: none;
+    font-size: 16px;
+    background: #0d2538;
+    color: #eee;
+  }
+  .login-box input:focus {
+    outline: none;
+    box-shadow: 0 0 8px #61dafb;
+  }
+  button {
+    width: 100%;
+    padding: 14px;
+    background: #61dafb;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 18px;
+    color: #142833;
+    cursor: pointer;
+  }
+  button:hover {
+    background: #21a1f1;
+  }
+  #loginError {
+    margin-top: 12px;
+    color: #f44336;
+    min-height: 18px;
+  }
+</style>
+</head>
+<body>
+
+<div class="login-box">
+  <h1>התחבר למערכת</h1>
+  <input type="text" id="usernameInput" placeholder="שם משתמש" />
+  <input type="password" id="passwordInput" placeholder="סיסמה" />
+  <button id="loginBtn">התחבר</button>
+  <div id="loginError"></div>
+</div>
+
+<script>
+  const USERNAME = "officer";
+  const PASSWORD = "1234";
+
+  document.getElementById("loginBtn").onclick = function() {
+    const user = document.getElementById("usernameInput").value.trim();
+    const pass = document.getElementById("passwordInput").value.trim();
+
+    if (user === USERNAME && pass === PASSWORD) {
+      // שמור את שם המשתמש בזיכרון המקומי
+      localStorage.setItem("loggedInUser", user);
+      // נווט לדף הטאבלט
+      window.location.href = "tablet.html";
+    } else {
+      document.getElementById("loginError").textContent = "שם משתמש או סיסמה שגויים";
+    }
+  }
+</script>
+
+</body>
+</html>
