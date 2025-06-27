@@ -3,41 +3,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>טאבלט משטרתי</title>
+  <title>טאבלט משטרתי - עיצוב משודרג</title>
   <style>
-    /* Reset & base */
+    @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;700&display=swap');
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
     }
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #060b12 0%, #0e1621 100%);
-      color: #fff;
+      font-family: 'Assistant', sans-serif;
+      background: linear-gradient(135deg, #0a192f, #13294b);
+      color: #d0d9ff;
       direction: rtl;
       height: 100vh;
-      overflow: hidden;
       display: flex;
       justify-content: center;
       align-items: center;
+      user-select: none;
     }
-
-    /* Screens */
     .screen {
       display: none;
-      width: 95vw;
-      max-width: 900px;
+      width: 90vw;
+      max-width: 950px;
       height: 95vh;
-      background: rgba(10, 20, 35, 0.75);
-      border-radius: 25px;
+      background: #1e2a47;
+      border-radius: 24px;
       box-shadow:
-        0 0 20px #1172ff44,
-        inset 0 0 40px #1172ff33;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+        0 0 25px #3c7dd9aa,
+        inset 0 0 30px #4484f5bb;
+      backdrop-filter: blur(15px);
+      -webkit-backdrop-filter: blur(15px);
       flex-direction: column;
-      padding: 15px;
+      padding: 25px 35px;
+      color: #cfd7ff;
       position: relative;
     }
     .screen.active {
@@ -45,74 +43,76 @@
       flex-direction: column;
     }
 
-    /* Login Screen */
+    /* Login screen */
     .login-box {
-      background: rgba(20, 30, 50, 0.85);
-      padding: 40px 30px;
+      width: 350px;
+      background: #2f3a62;
       border-radius: 20px;
-      box-shadow:
-        0 0 15px #1172ffcc;
-      width: 320px;
+      padding: 40px 30px;
+      box-shadow: 0 0 18px #3c7dd9cc;
       text-align: center;
     }
     .login-box h2 {
-      margin-bottom: 20px;
       font-weight: 700;
-      letter-spacing: 1.2px;
-      font-size: 1.8rem;
-      color: #59aaff;
-      text-shadow: 0 0 6px #59aaff99;
+      font-size: 2rem;
+      color: #84a9ff;
+      margin-bottom: 25px;
+      text-shadow: 0 0 8px #84a9ffbb;
     }
     .login-box input {
       width: 100%;
-      padding: 14px 15px;
-      border-radius: 10px;
+      padding: 14px 16px;
+      border-radius: 14px;
       border: none;
-      margin-bottom: 18px;
+      margin-bottom: 22px;
+      background: #2a3660;
+      color: #d0d9ff;
       font-size: 1.1rem;
-      background: rgba(255 255 255 / 0.07);
-      color: #d9e8ff;
       text-align: center;
       transition: background-color 0.3s ease;
+      box-shadow: inset 0 0 8px #3f5ae4bb;
     }
     .login-box input:focus {
-      background-color: rgba(255 255 255 / 0.14);
       outline: none;
+      background: #394d9c;
+      box-shadow: inset 0 0 12px #6690ffcc;
     }
     .login-box button {
       width: 100%;
       padding: 14px 0;
-      border-radius: 10px;
+      border-radius: 16px;
       border: none;
-      background-color: #2179ff;
-      font-size: 1.3rem;
+      background: #4a7cf5;
       font-weight: 700;
-      color: #fff;
+      font-size: 1.3rem;
+      color: #e7eefa;
       cursor: pointer;
-      box-shadow: 0 0 15px #2179ffaa;
+      box-shadow: 0 0 15px #4a7cf5cc;
       transition: background-color 0.3s ease;
     }
     .login-box button:hover {
-      background-color: #134bcd;
+      background: #3659bf;
+      box-shadow: 0 0 20px #3659bfcc;
     }
     .error-msg {
-      color: #f44;
       margin-top: 6px;
       font-size: 0.9rem;
+      color: #ff6b6b;
+      text-shadow: 0 0 6px #ff6b6bbb;
+      min-height: 20px;
     }
 
-    /* Tablet Screen */
+    /* Tablet header */
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0 30px;
-      margin-bottom: 15px;
+      padding: 0 35px;
+      margin-bottom: 25px;
       font-weight: 700;
-      font-size: 1.3rem;
-      color: #59aaff;
-      text-shadow: 0 0 8px #59aaffbb;
-      user-select: none;
+      font-size: 1.45rem;
+      color: #84a9ff;
+      text-shadow: 0 0 10px #84a9ffcc;
     }
     .logo {
       user-select: none;
@@ -120,13 +120,16 @@
     .user-profile {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       user-select: none;
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #acc6ff;
     }
     .user-icon {
       width: 26px;
       height: 26px;
-      stroke: #59aaff;
+      stroke: #84a9ff;
       stroke-width: 2;
       fill: none;
     }
@@ -135,37 +138,62 @@
     nav {
       display: flex;
       justify-content: space-between;
-      padding: 0 20px;
-      margin-bottom: 20px;
+      padding: 0 30px;
+      margin-bottom: 25px;
       user-select: none;
     }
     nav button {
-      background: transparent;
+      background: #2c3b6a;
       border: none;
       cursor: pointer;
-      padding: 10px;
-      border-radius: 14px;
-      transition: all 0.25s ease;
-      position: relative;
-      color: #59aaff;
-      filter: drop-shadow(0 0 6px #59aaff77);
-      font-size: 1.6rem;
+      padding: 12px 18px;
+      border-radius: 18px;
+      color: #8fa9ff;
+      font-size: 1.2rem;
       font-weight: 700;
-      width: 18%;
+      flex: 1;
+      margin: 0 8px;
+      box-shadow: 0 0 15px #2c3b6a88;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      user-select: none;
     }
-    nav button.active,
-    nav button:hover {
-      background: #2179ff44;
-      filter: drop-shadow(0 0 10px #2179ffbb);
-      color: #9ecbff;
+    nav button:hover,
+    nav button.active {
+      background: #4872ff;
+      color: #e7eefa;
+      box-shadow: 0 0 30px #4872ffcc;
+    }
+    nav button:first-child {
+      margin-right: 12px;
+    }
+    nav button:last-child {
+      margin-left: 12px;
     }
 
     /* Main content */
     main {
       flex: 1;
       overflow-y: auto;
-      padding: 0 30px 30px;
-      user-select: none;
+      padding: 0 35px 30px;
+      user-select: text;
+      scrollbar-width: thin;
+      scrollbar-color: #5e7be0 transparent;
+    }
+    main::-webkit-scrollbar {
+      width: 10px;
+    }
+    main::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    main::-webkit-scrollbar-thumb {
+      background-color: #5e7be0;
+      border-radius: 6px;
+      border: 2px solid transparent;
+      background-clip: content-box;
     }
     .tab {
       display: none;
@@ -174,70 +202,76 @@
       display: block;
     }
     h2 {
-      margin-bottom: 15px;
-      color: #8db9ff;
-      text-shadow: 0 0 5px #74a0ffcc;
+      margin-bottom: 22px;
+      color: #acc6ff;
+      text-shadow: 0 0 6px #6688f7cc;
+      font-weight: 700;
+      font-size: 1.6rem;
     }
     form {
-      margin-bottom: 20px;
+      margin-bottom: 25px;
       display: flex;
       flex-direction: column;
+      max-width: 500px;
     }
     form input, form textarea {
-      background: rgba(255 255 255 / 0.1);
-      border-radius: 12px;
+      background: #384e8a;
+      border-radius: 14px;
       border: none;
-      color: #d9e8ff;
-      font-size: 1rem;
-      margin-bottom: 15px;
-      padding: 10px 12px;
-      box-shadow:
-        inset 0 0 8px #3a8bff88;
+      color: #d0d9ff;
+      font-size: 1.1rem;
+      margin-bottom: 18px;
+      padding: 14px 16px;
+      box-shadow: inset 0 0 12px #4b6cc5cc;
       transition: box-shadow 0.3s ease;
       resize: vertical;
-      min-height: 40px;
+      min-height: 42px;
     }
     form input:focus, form textarea:focus {
       outline: none;
-      box-shadow:
-        inset 0 0 14px #56aaffcc;
+      box-shadow: inset 0 0 16px #7797ffcc;
+      background: #4a63a8;
+    }
+    form textarea {
+      min-height: 80px;
     }
     form button {
-      align-self: flex-start;
+      width: max-content;
       cursor: pointer;
-      padding: 10px 18px;
-      background: #2179ff;
-      border-radius: 15px;
+      padding: 12px 25px;
+      background: #4e6dff;
+      border-radius: 22px;
       border: none;
-      color: white;
-      font-weight: 600;
-      font-size: 1.1rem;
-      box-shadow: 0 0 12px #2179ffbb;
+      color: #e7eefa;
+      font-weight: 700;
+      font-size: 1.15rem;
+      box-shadow: 0 0 20px #4e6dffcc;
       transition: background-color 0.3s ease;
     }
     form button:hover {
-      background-color: #134bcd;
+      background-color: #2f4cdb;
+      box-shadow: 0 0 30px #2f4cdbcc;
     }
 
     .list-container {
-      max-height: 300px;
+      max-height: 290px;
       overflow-y: auto;
-      background: rgba(21, 40, 65, 0.7);
-      border-radius: 15px;
-      padding: 10px 15px;
-      box-shadow:
-        inset 0 0 15px #2179ff88;
+      background: #2c3b6a;
+      border-radius: 20px;
+      padding: 18px 22px;
+      box-shadow: inset 0 0 18px #4468cc88;
+      user-select: text;
     }
     .list-item {
-      padding: 10px 15px;
-      margin-bottom: 10px;
-      background: #14284d;
-      border-radius: 12px;
-      box-shadow:
-        0 0 6px #2179ff66;
-      font-size: 1rem;
-      color: #cce5ff;
+      padding: 14px 18px;
+      margin-bottom: 14px;
+      background: #364a85;
+      border-radius: 14px;
+      box-shadow: 0 0 14px #4a6aff77;
+      font-size: 1.05rem;
+      color: #dbe3ffcc;
       user-select: text;
+      line-height: 1.3;
     }
     .list-item strong {
       color: #9ecbff;
@@ -245,87 +279,108 @@
     }
     .list-item .timestamp {
       font-size: 0.8rem;
-      color: #7792a2;
-      margin-top: 3px;
+      color: #a5b5d3;
+      margin-top: 5px;
       user-select: text;
+    }
+
+    /* Responsive */
+    @media (max-width: 720px) {
+      .login-box {
+        width: 90vw;
+        padding: 30px 20px;
+      }
+      nav button {
+        font-size: 1rem;
+        margin: 0 4px;
+        padding: 10px 6px;
+      }
+      main {
+        padding: 0 20px 20px;
+      }
+      form {
+        max-width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-  <div id="loginScreen" class="screen active">
-    <div class="login-box">
-      <h2>התחברות למערכת</h2>
-      <input type="text" id="usernameInput" placeholder="שם משתמש" />
-      <input type="password" id="passwordInput" placeholder="סיסמה" />
-      <button id="loginBtn">התחבר</button>
-      <p id="loginError" class="error-msg"></p>
+  <!-- Login screen -->
+  <div id="loginScreen" class="screen active" role="main" aria-label="מסך התחברות">
+    <div class="login-box" role="form" aria-labelledby="loginTitle">
+      <h2 id="loginTitle">התחברות למערכת</h2>
+      <input type="text" id="usernameInput" placeholder="שם משתמש" aria-label="שם משתמש" autocomplete="username" />
+      <input type="password" id="passwordInput" placeholder="סיסמה" aria-label="סיסמה" autocomplete="current-password" />
+      <button id="loginBtn" aria-describedby="loginError">התחבר</button>
+      <div id="loginError" class="error-msg" role="alert" aria-live="assertive"></div>
     </div>
   </div>
 
-  <div id="tabletScreen" class="screen">
+  <!-- Tablet screen -->
+  <div id="tabletScreen" class="screen" role="main" aria-label="מסך טאבלט משטרתי">
     <header>
-      <div class="logo">משטרת ישראל</div>
-      <div class="user-profile">
-        <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7" r="4"></circle><path d="M5.5 21a7.5 7.5 0 0113 0"></path></svg>
-        <span id="loggedInUser"></span>
+      <div class="logo">טאבלט משטרתי</div>
+      <div class="user-profile" aria-live="polite" aria-atomic="true">
+        <svg class="user-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M5 21c0-3.5 7-3.5 7-3.5S19 17.5 19 21"/></svg>
+        <span id="loggedInUser">משתמש</span>
       </div>
     </header>
 
-    <nav>
-      <button data-target="registration" class="nav-btn active" title="רישום">רישום</button>
-      <button data-target="chase" class="nav-btn" title="רדיפה">רדיפה</button>
-      <button data-target="backup" class="nav-btn" title="גיבוי">גיבוי</button>
-      <button data-target="search" class="nav-btn" title="בדיקה">בדיקה</button>
-      <button data-target="report" class="nav-btn" title="דוח">דוח</button>
+    <nav role="navigation" aria-label="תפריט ניווט">
+      <button class="active" data-target="registration" aria-controls="registration" aria-selected="true" role="tab">רישום</button>
+      <button data-target="chase" aria-controls="chase" aria-selected="false" role="tab">רדיפה</button>
+      <button data-target="backup" aria-controls="backup" aria-selected="false" role="tab">גיבוי</button>
+      <button data-target="search" aria-controls="search" aria-selected="false" role="tab">בדיקה</button>
+      <button data-target="report" aria-controls="report" aria-selected="false" role="tab">דוח</button>
     </nav>
 
     <main>
-      <section id="registration" class="tab active">
-        <h2>רישום שוטרים</h2>
+      <section id="registration" class="tab active" role="tabpanel" tabindex="0" aria-labelledby="registration-tab">
+        <h2>רישום</h2>
         <form id="registrationForm">
-          <input type="text" name="name" placeholder="שם מלא" required />
-          <input type="text" name="unit" placeholder="יחידה" required />
+          <input type="text" name="name" placeholder="שם מלא" required aria-label="שם מלא" />
+          <input type="text" name="unit" placeholder="יחידה" required aria-label="יחידה" />
           <button type="submit">שלח רישום</button>
         </form>
-        <div class="list-container" id="registrationList"></div>
+        <div class="list-container" id="registrationList" aria-live="polite" aria-relevant="additions"></div>
       </section>
 
-      <section id="chase" class="tab">
-        <h2>דיווח רדיפה</h2>
+      <section id="chase" class="tab" role="tabpanel" tabindex="0" aria-labelledby="chase-tab">
+        <h2>רדיפה</h2>
         <form id="chaseForm">
-          <input type="text" name="suspect" placeholder="שם החשוד" required />
-          <input type="text" name="vehicle" placeholder="רכב החשוד" required />
+          <input type="text" name="suspect" placeholder="שם החשוד" required aria-label="שם החשוד" />
+          <input type="text" name="vehicle" placeholder="רכב החשוד" required aria-label="רכב החשוד" />
           <button type="submit">דווח על רדיפה</button>
         </form>
-        <div class="list-container" id="chaseList"></div>
+        <div class="list-container" id="chaseList" aria-live="polite" aria-relevant="additions"></div>
       </section>
 
-      <section id="backup" class="tab">
-        <h2>בקשת גיבוי</h2>
+      <section id="backup" class="tab" role="tabpanel" tabindex="0" aria-labelledby="backup-tab">
+        <h2>גיבוי</h2>
         <form id="backupForm">
-          <input type="text" name="location" placeholder="מיקום" required />
-          <input type="text" name="reason" placeholder="סיבה" required />
+          <input type="text" name="location" placeholder="מיקום" required aria-label="מיקום" />
+          <input type="text" name="reason" placeholder="סיבה" required aria-label="סיבה" />
           <button type="submit">בקש גיבוי</button>
         </form>
-        <div class="list-container" id="backupList"></div>
+        <div class="list-container" id="backupList" aria-live="polite" aria-relevant="additions"></div>
       </section>
 
-      <section id="search" class="tab">
+      <section id="search" class="tab" role="tabpanel" tabindex="0" aria-labelledby="search-tab">
         <h2>בדיקת רישום</h2>
         <form id="searchForm">
-          <input type="text" name="query" placeholder="מה לבדוק?" required />
+          <input type="text" name="query" placeholder="מה לבדוק?" required aria-label="מה לבדוק?" />
           <button type="submit">בדוק</button>
         </form>
-        <div class="list-container" id="searchList"></div>
+        <div class="list-container" id="searchList" aria-live="polite" aria-relevant="additions"></div>
       </section>
 
-      <section id="report" class="tab">
+      <section id="report" class="tab" role="tabpanel" tabindex="0" aria-labelledby="report-tab">
         <h2>דוח</h2>
         <form id="reportForm">
-          <textarea name="description" placeholder="פרטי הדוח" required></textarea>
+          <textarea name="description" placeholder="פרטי הדוח" required aria-label="פרטי הדוח"></textarea>
           <button type="submit">שלח דוח</button>
         </form>
-        <div class="list-container" id="reportList"></div>
+        <div class="list-container" id="reportList" aria-live="polite" aria-relevant="additions"></div>
       </section>
     </main>
   </div>
