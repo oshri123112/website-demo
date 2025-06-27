@@ -175,7 +175,7 @@
     admin: "admin321"
   };
 
-  // משתנה שומר מצב מערכת להתחברות
+  // משתנה גלובלי למערכת המחוברת
   let currentSystem = null;
 
   loginForm.addEventListener('submit', (e) => {
@@ -191,6 +191,9 @@
 
       const label = selectedSystem === 'admin' ? "צוות ניהולי" : "משטרת ישראל";
       systemTitle.innerText = `מערכת דיווח - ${label}`;
+
+      // טען דוחות מחדש אחרי התחברות כדי לעדכן כפתורי מחיקה לפי סוג המשתמש
+      loadReports();
     } else {
       loginError.style.display = 'block';
     }
@@ -223,62 +226,64 @@
     }
   });
 
-  // הצגת דוחות עם אפשרות מחיקה לצוות ניהולי
-  db.collection('reports').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
-    reportsList.innerHTML = '<h2>דוחות קיימים</h2>';
-    loadingMessage.style.display = 'none';
+  // פונקציה לטעינת דוחות ולהצגת כפתורי מחיקה בהתאם למערכת המחוברת
+  function loadReports() {
+    reportsList.innerHTML = '<h2>דוחות קיימים</h2><p id="loadingMessage">טוען דוחות...</p>';
+    const unsubscribe = db.collection('reports').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
+      reportsList.innerHTML = '<h2>דוחות קיימים</h2>';
 
-    if (snapshot.empty) {
-      reportsList.innerHTML += '<p>אין דוחות להצגה כרגע.</p>';
-      return;
-    }
-
-    snapshot.forEach(doc => {
-      const report = doc.data();
-      const reportId = doc.id;
-      const reportItem = document.createElement('div');
-      reportItem.classList.add('report-item');
-
-      let timestampText = '';
-      if (report.timestamp) {
-        const date = report.timestamp.toDate();
-        timestampText = new Date(date).toLocaleString('he-IL', {
-          year: 'numeric', month: 'numeric', day: 'numeric',
-          hour: 'numeric', minute: 'numeric', second: 'numeric',
-          hour12: false
-        });
+      if (snapshot.empty) {
+        reportsList.innerHTML += '<p>אין דוחות להצגה כרגע.</p>';
+        return;
       }
 
-      // HTML הדוח
-      reportItem.innerHTML = `
-        <p><strong>שוטר:</strong> ${report.officerName}</p>
-        <p><strong>דוח:</strong> ${report.description}</p>
-        <p class="report-timestamp">${timestampText}</p>
-      `;
+      snapshot.forEach(doc => {
+        const report = doc.data();
+        const reportId = doc.id;
+        const reportItem = document.createElement('div');
+        reportItem.classList.add('report-item');
 
-      // אם המשתמש הוא צוות ניהולי, הוסף כפתור מחיקה
-      if (currentSystem === 'admin') {
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'delete-btn';
-        deleteBtn.textContent = 'מחק דוח';
-        deleteBtn.onclick = async () => {
-          if (confirm('למחוק דוח זה?')) {
-            try {
-              await db.collection('reports').doc(reportId).delete();
-            } catch (error) {
-              alert('שגיאה במחיקת הדוח: ' + error.message);
+        let timestampText = '';
+        if (report.timestamp) {
+          const date = report.timestamp.toDate();
+          timestampText = new Date(date).toLocaleString('he-IL', {
+            year: 'numeric', month: 'numeric', day: 'numeric',
+            hour: 'numeric', minute: 'numeric', second: 'numeric',
+            hour12: false
+          });
+        }
+
+        reportItem.innerHTML = `
+          <p><strong>שוטר:</strong> ${report.officerName}</p>
+          <p><strong>דוח:</strong> ${report.description}</p>
+          <p class="report-timestamp">${timestampText}</p>
+        `;
+
+        // כפתור מחיקה רק לצוות ניהולי
+        if (currentSystem === 'admin') {
+          const deleteBtn = document.createElement('button');
+          deleteBtn.className = 'delete-btn';
+          deleteBtn.textContent = 'מחק דוח';
+          deleteBtn.onclick = async () => {
+            if (confirm('למחוק דוח זה?')) {
+              try {
+                await db.collection('reports').doc(reportId).delete();
+              } catch (error) {
+                alert('שגיאה במחיקת הדוח: ' + error.message);
+              }
             }
-          }
-        };
-        reportItem.appendChild(deleteBtn);
-      }
+          };
+          reportItem.appendChild(deleteBtn);
+        }
 
-      reportsList.appendChild(reportItem);
+        reportsList.appendChild(reportItem);
+      });
+    }, error => {
+      reportsList.innerHTML = `<p>שגיאה בטעינת הדוחות: ${error.message}</p>`;
     });
-  }, error => {
-    reportsList.innerHTML = `<p>שגיאה בטעינת הדוחות: ${error.message}</p>`;
-  });
-</script>
+  }
 
+  // לא טוען דוחות מראש, אלא רק אחרי התחברות מוצלחת
+</script>
 </body>
 </html>
