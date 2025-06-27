@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>מערכת טאבלט משטרתי עם Firebase</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Rubik&display=swap');
+  body {
+    margin: 0; padding: 0;
+    font-family: 'Rubik', sans-serif;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #eee;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .screen {
+    display: none;
+    width: 90vw;
+    max-width: 900px;
+    height: 90vh;
+    background: #142833;
+    border-radius: 18px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.8);
+    flex-direction: column;
+  }
+  .screen.active {
+    display: flex;
+  }
+  /* --- Login screen --- */
+  #loginScreen {
+    justify-content: center;
+    align-items: center;
+  }
+  #loginBox {
+    background: #0d2538;
+    padding: 40px 30px;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+    width: 320px;
+    text-align: center;
+  }
+  #loginBox h1 {
+    margin-bottom: 30px;
+    color: #61dafb;
+  }
+  #loginBox input {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    border: none;
+    font-size: 16px;
+    background: #0d2538;
+    color: #eee;
+  }
+  #loginBox input:focus {
+    outline: none;
+    box-shadow: 0 0 8px #61dafb;
+  }
+  #loginBox button {
+    width: 100%;
+    padding: 14px;
+    background: #61dafb;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 18px;
+    color: #142833;
+    cursor: pointer;
+  }
+  #loginBox button:hover {
+    background: #21a1f1;
+  }
+  #loginError {
+    margin-top: 12px;
+    color: #f44336;
+    min-height: 18px;
+  }
+  /* --- Tablet screen --- */
+  #tabletScreen {
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    padding: 15px 25px;
+    background: #0d2538;
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #61dafb;
+    font-weight: 700;
+    font-size: 20px;
+  }
+  header .user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 500;
+    font-size: 16px;
+    color: #cfd8dc;
+  }
+  nav {
+    display: flex;
+    background: #0d2538;
+    padding: 10px 15px;
+    justify-content: space-around;
+    border-bottom: 2px solid #61dafb;
+  }
+  nav button {
+    background: transparent;
+    border: none;
+    color: #9bb7c0;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 12px 18px;
+    border-radius: 12px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  nav button.active,
+  nav button:hover {
+    background: #61dafb;
+    color: #142833;
+    box-shadow: 0 4px 12px rgba(97,218,251,0.7);
+  }
+  main {
+    flex: 1;
+    padding: 20px 30px;
+    overflow-y: auto;
+    background: #0d2538;
+    border-bottom-left-radius: 18px;
+    border-bottom-right-radius: 18px;
+    color: #ddd;
+  }
+  main section {
+    display: none;
+  }
+  main section.active {
+    display: block;
+  }
+  main section h2 {
+    margin-top: 0;
+    color: #61dafb;
+    font-weight: 700;
+    margin-bottom: 15px;
+    font-size: 22px;
+  }
+  form {
+    margin-bottom: 20px;
+  }
+  input[type="text"], textarea {
+    width: 100%;
+    padding: 10px 15px;
+    margin: 10px 0 15px 0;
+    border-radius: 10px;
+    border: none;
+    font-size: 16px;
+    background: #0f344f;
+    color: #eee;
+    box-shadow: inset 0 0 8px #153a5a;
+    resize: vertical;
+  }
+  input[type="text"]:focus, textarea:focus {
+    outline: none;
+    box-shadow: 0 0 8px #61dafb;
+  }
+  button.submit-btn {
+    background: #61dafb;
+    padding: 14px 25px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 18px;
+    color: #142833;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  button.submit-btn:hover {
+    background: #21a1f1;
+  }
+  .list-item {
+    background: #15364f;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  }
+  .timestamp {
+    font-size: 0.8em;
+    color: #a0a0a0;
+    margin-top: 4px;
+  }
+  /* Scrollbar styling */
+  main::-webkit-scrollbar {
+    width: 8px;
+  }
+  main::-webkit-scrollbar-track {
+    background: #0d2538;
+  }
+  main::-webkit-scrollbar-thumb {
+    background: #61dafb;
+    border-radius: 4px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Login Screen -->
+<div id="loginScreen" class="screen active">
+  <div id="loginBox">
+    <h1>התחבר למערכת</h1>
+    <input type="text" id="usernameInput" placeholder="שם משתמש" autocomplete="off" />
+    <input type="password" id="passwordInput" placeholder="סיסמה" autocomplete="off" />
+    <button id="loginBtn">התחבר</button>
+    <div id="loginError"></div>
+  </div>
+</div>
+
+<!-- Tablet Screen -->
+<div id="tabletScreen" class="screen">
+  <header>
+    <div>טאבלט משטרתי</div>
+    <div class="user-profile" id="userDisplay">
+      משתמש: <span id="loggedUser"></span>
+      &nbsp;|&nbsp;
+      <button style="background:none; border:none; color:#61dafb; cursor:pointer; font-weight:600;" id="logoutBtn">התנתק</button>
+    </div>
+  </header>
+  <nav>
+    <button class="nav-btn active" data-target="registration">רישום</button>
+    <button class="nav-btn" data-target="chase">רדיפה</button>
+    <button class="nav-btn" data-target="backup">גיבוי</button>
+    <button class="nav-btn" data-target="search">בדיקה</button>
+    <button class="nav-btn" data-target="report">דוח</button>
+  </nav>
+  <main>
+    <section id="registration" class="active">
+      <h2>רישום שוטרים</h2>
+      <form id="registrationForm">
+        <input type="text" name="name" placeholder="שם מלא" required />
+        <input type="text" name="unit" placeholder="יחידה" required />
+        <button type="submit" class="submit-btn">שלח רישום</button>
+      </form>
+      <div id="registrationList"></div>
+    </section>
+
+    <section id="chase">
+      <h2>דיווח על רדיפה</h2>
+      <form id="chaseForm">
+        <input type="text" name="suspect" placeholder="שם החשוד" required />
+        <input type="text" name="vehicle" placeholder="רכב החשוד" required />
+        <button type="submit" class="submit-btn">דווח על רדיפה</button>
+      </form>
+      <div id="chaseList"></div>
+    </section>
+
+    <section id="backup">
+      <h2>בקשת גיבוי</h2>
+      <form id="backupForm">
+        <input type="text" name="location" placeholder="מיקום" required />
+        <input type="text" name="reason" placeholder="סיבה" required />
+        <button type="submit" class="submit-btn">בקש גיבוי</button>
+      </form>
+      <div id="backupList"></div>
+    </section>
+
+    <section id="search">
+      <h2>בדיקות וחקירות</h2>
+      <form id="searchForm">
+        <input type="text" name="query" placeholder="מה לבדוק?" required />
+        <button type="submit" class="submit-btn">בדוק</button>
+      </form>
+      <div id="searchList"></div>
+    </section>
+
+    <section id="report">
+      <h2>דוחות</h2>
+      <form id="reportForm">
+        <textarea name="description" placeholder="פרטי הדוח" required></textarea>
+        <button type="submit" class="submit-btn">שלח דוח</button>
+      </form>
+      <div id="reportList"></div>
+    </section>
+  </main>
+</div>
+
+<!-- Firebase Scripts -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+  // Firebase configuration - החלף בפרטים שלך אם יש צורך
+  const firebaseConfig = {
+    apiKey: "AIzaSyAAADd1lL5cgTgTxQOC8VSrjLlIsDlRyIk",
+    authDomain: "policereportsystem-f23fd.firebaseapp.com",
+    projectId: "policereportsystem-f23fd",
+    storageBucket: "policereportsystem-f23fd.appspot.com",
+    messagingSenderId: "93022201022",
+    appId: "1:93022201022:web:b33be966dcac2ce8612aef"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  // התחברות - משתמש וסיסמה קשיחים
+  const USERNAME = "officer";
+  const PASSWORD = "1234";
+
+  const loginScreen = document.getElementById("loginScreen");
+  const tabletScreen = document.getElementById("tabletScreen");
+  const loginError = document.getElementById("loginError");
+  const usernameInput = document.getElementById("usernameInput");
+  const passwordInput = document.getElementById("passwordInput");
+  const loggedUserSpan = document.getElementById("loggedUser");
+  const logoutBtn = document.getElementById("logoutBtn");
+
+  document.getElementById("loginBtn").onclick = () => {
+    const user = usernameInput.value.trim();
+    const pass = passwordInput.value.trim();
+    if (user === USERNAME && pass === PASSWORD) {
+      loginError.textContent = "";
+      loggedUserSpan.textContent = user;
+      loginScreen.classList.remove("active");
+      tabletScreen.classList.add("active");
+    } else {
+      loginError.textContent = "שם משתמש או סיסמה שגויים";
+    }
+  };
+
+  logoutBtn.onclick = () => {
+    tabletScreen.classList.remove("active");
+    loginScreen.classList.add("active");
+    usernameInput.value = "";
+    passwordInput.value = "";
+  };
+
+  // ניווט בין הכרטיסיות
+  const navButtons = document.querySelectorAll("nav button");
+  const sections = document.querySelectorAll("main section");
+
+  navButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      navButtons.forEach(b => b.classList.remove("active"));
+      sections.forEach(s => s.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById(btn.dataset.target).classList.add("active");
+    });
+  });
+
+  // פונקציה לשליחת טפסים ל-Firebase
+  function submitToFirebase(formId, collectionName) {
+    const form = document.getElementById(formId);
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      const data = {};
+      Array.from(form.elements).forEach(el => {
+        if (el.name) data[el.name] = el.value.trim();
+      });
+      data.timestamp = firebase.firestore.FieldValue.serverTimestamp();
+      db.collection(collectionName).add(data)
+        .then(() => {
+          form.reset();
+        })
+        .catch(err => {
+          alert("שגיאה בשליחת הנתונים: " + err.message);
+        });
+    });
+  }
+
+  submitToFirebase("registrationForm", "registration");
+  submitToFirebase("chaseForm", "chases");
+  submitToFirebase("backupForm", "backups");
+  submitToFirebase("searchForm", "searches");
+  submitToFirebase("reportForm", "reports");
+
+  // פונקציה להצגת רשימות בזמן אמת
+  function renderList(collectionName, containerId, formatter) {
+    const container = document.getElementById(containerId);
+    db.collection(collectionName).orderBy("timestamp", "desc").onSnapshot(snapshot => {
+      container.innerHTML = "";
+      if (snapshot.empty) {
+        container.innerHTML = "<p>אין פריטים להצגה כרגע.</p>";
+        return;
+      }
+      snapshot.forEach(doc => {
+        const d = doc.data();
+        const ts = d.timestamp ? d.timestamp.toDate().toLocaleString("he-IL") : "---";
+        const div = document.createElement("div");
+        div.className = "list-item";
+        div.innerHTML = formatter(d, ts);
+        container.appendChild(div);
+      });
+    });
+  }
+
+  renderList("registration", "registrationList", (d, ts) =>
+    `<strong>שם:</strong> ${d.name} | <strong>יחידה:</strong> ${d.unit}<div class="timestamp">${ts}</div>`
+  );
+  renderList("chases", "chaseList", (d, ts) =>
+    `<strong>חשוד:</strong> ${d.suspect} | <strong>רכב:</strong> ${d.vehicle}<div class="timestamp">${ts}</div>`
+  );
+  renderList("backups", "backupList", (d, ts) =>
+    `<strong>מיקום:</strong> ${d.location} | <strong>סיבה:</strong> ${d.reason}<div class="timestamp">${ts}</div>`
+  );
+  renderList("searches", "searchList", (d, ts) =>
+    `<strong>חיפוש:</strong> ${d.query}<div class="timestamp">${ts}</div>`
+  );
+  renderList("reports", "reportList", (d, ts) =>
+    `<strong>דוח:</strong> ${d.description}<div class="timestamp">${ts}</div>`
+  );
+</script>
+
+</body>
+</html>
