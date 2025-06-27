@@ -36,13 +36,13 @@
             margin-bottom: 5px;
             font-weight: bold;
         }
-        input[type="text"], textarea {
+        input[type="text"], input[type="password"], textarea {
             width: calc(100% - 22px);
             padding: 10px;
             margin-bottom: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
-            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+            box-sizing: border-box;
         }
         textarea {
             resize: vertical;
@@ -82,12 +82,25 @@
         .report-timestamp {
             font-size: 0.8em;
             color: #777;
-            text-align: left; /* For timestamp, align left */
+            text-align: left;
         }
     </style>
 </head>
 <body>
-    <div class="container">
+
+    <!-- מסך התחברות -->
+    <div id="loginScreen" class="container">
+        <h1>התחברות למערכת</h1>
+        <form id="loginForm">
+            <label for="password">הזן סיסמה:</label>
+            <input type="password" id="password" required>
+            <button type="submit">התחבר</button>
+            <p id="loginError" style="color: red; display: none;">סיסמה שגויה</p>
+        </form>
+    </div>
+
+    <!-- מערכת דיווח -->
+    <div id="mainApp" class="container" style="display: none;">
         <h1>מערכת דיווח משטרתית</h1>
 
         <form id="reportForm">
@@ -107,58 +120,79 @@
         </div>
     </div>
 
+    <!-- Firebase Scripts -->
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+    <!-- Script -->
     <script>
-        // Your Firebase configuration object goes here
-        // This is the code you copied in Step 2.3
+        // קונפיגורציית Firebase שלך
         const firebaseConfig = {
             apiKey: "AIzaSyAAADd1lL5cgTgTxQOC8VSrjLlIsDlRyIk",
             authDomain: "policereportsystem-f23fd.firebaseapp.com",
             projectId: "policereportsystem-f23fd",
-            storageBucket: "policereportsystem-f23fd.firebasestorage.app",
+            storageBucket: "policereportsystem-f23fd.appspot.com",
             messagingSenderId: "93022201022",
             appId: "1:93022201022:web:b33be966dcac2ce8612aef",
-            measurementId: "G-312TDJBX4T" // Optional, if you enabled Analytics
+            measurementId: "G-312TDJBX4T"
         };
 
-        // Initialize Firebase
+        // אתחול Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        // התחברות
+        const loginScreen = document.getElementById('loginScreen');
+        const mainApp = document.getElementById('mainApp');
+        const loginForm = document.getElementById('loginForm');
+        const passwordInput = document.getElementById('password');
+        const loginError = document.getElementById('loginError');
+        const CORRECT_PASSWORD = "police123";
+
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const enteredPassword = passwordInput.value;
+
+            if (enteredPassword === CORRECT_PASSWORD) {
+                loginScreen.style.display = 'none';
+                mainApp.style.display = 'block';
+            } else {
+                loginError.style.display = 'block';
+            }
+        });
+
+        // מערכת הדיווח
         const reportForm = document.getElementById('reportForm');
         const officerNameInput = document.getElementById('officerName');
         const reportDescriptionInput = document.getElementById('reportDescription');
         const reportsList = document.getElementById('reportsList');
         const loadingMessage = document.getElementById('loadingMessage');
 
-        // Function to add a new report
+        // שליחת דוח
         reportForm.addEventListener('submit', async (e) => {
-            e.preventDefault(); // Prevent default form submission
-
+            e.preventDefault();
             const officerName = officerNameInput.value;
             const reportDescription = reportDescriptionInput.value;
-            const timestamp = firebase.firestore.FieldValue.serverTimestamp(); // Get server timestamp
+            const timestamp = firebase.firestore.FieldValue.serverTimestamp();
 
             try {
                 await db.collection('reports').add({
-                    officerName: officerName,
+                    officerName,
                     description: reportDescription,
-                    timestamp: timestamp
+                    timestamp
                 });
-                console.log("Document successfully written!");
-                officerNameInput.value = ''; // Clear form
-                reportDescriptionInput.value = ''; // Clear form
+                officerNameInput.value = '';
+                reportDescriptionInput.value = '';
             } catch (error) {
                 console.error("Error writing document: ", error);
                 alert("שגיאה בשליחת הדוח: " + error.message);
             }
         });
 
-        // Real-time listener for reports
+        // הצגת דוחות בזמן אמת
         db.collection('reports').orderBy('timestamp', 'desc').onSnapshot((snapshot) => {
-            reportsList.innerHTML = '<h2>דוחות קיימים</h2>'; // Clear existing reports
-            loadingMessage.style.display = 'none'; // Hide loading message
+            reportsList.innerHTML = '<h2>דוחות קיימים</h2>';
+            loadingMessage.style.display = 'none';
 
             if (snapshot.empty) {
                 reportsList.innerHTML += '<p>אין דוחות להצגה כרגע.</p>';
@@ -172,12 +206,11 @@
 
                 let timestampText = '';
                 if (report.timestamp) {
-                    // Convert Firebase Timestamp to Date object
                     const date = report.timestamp.toDate();
                     timestampText = new Date(date).toLocaleString('he-IL', {
                         year: 'numeric', month: 'numeric', day: 'numeric',
                         hour: 'numeric', minute: 'numeric', second: 'numeric',
-                        hour12: false // Use 24-hour format
+                        hour12: false
                     });
                 }
 
