@@ -1,417 +1,1815 @@
+הקוד הקודם 
+
+
+
 <!DOCTYPE html>
-<html lang="he" dir="rtl">
+<html lang="he">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>מערכת טאבלט משטרתי עם Firebase</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Rubik&display=swap');
-  body {
-    margin: 0; padding: 0;
-    font-family: 'Rubik', sans-serif;
-    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-    color: #eee;
-    height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  .screen {
-    display: none;
-    width: 90vw;
-    max-width: 900px;
-    height: 90vh;
-    background: #142833;
-    border-radius: 18px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.8);
-    flex-direction: column;
-  }
-  .screen.active {
-    display: flex;
-  }
-  /* --- Login screen --- */
-  #loginScreen {
-    justify-content: center;
-    align-items: center;
-  }
-  #loginBox {
-    background: #0d2538;
-    padding: 40px 30px;
-    border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-    width: 320px;
-    text-align: center;
-  }
-  #loginBox h1 {
-    margin-bottom: 30px;
-    color: #61dafb;
-  }
-  #loginBox input {
-    width: 100%;
-    padding: 12px 15px;
-    margin-bottom: 20px;
-    border-radius: 10px;
-    border: none;
-    font-size: 16px;
-    background: #0d2538;
-    color: #eee;
-  }
-  #loginBox input:focus {
-    outline: none;
-    box-shadow: 0 0 8px #61dafb;
-  }
-  #loginBox button {
-    width: 100%;
-    padding: 14px;
-    background: #61dafb;
-    border: none;
-    border-radius: 10px;
-    font-weight: 700;
-    font-size: 18px;
-    color: #142833;
-    cursor: pointer;
-  }
-  #loginBox button:hover {
-    background: #21a1f1;
-  }
-  #loginError {
-    margin-top: 12px;
-    color: #f44336;
-    min-height: 18px;
-  }
-  /* --- Tablet screen --- */
-  #tabletScreen {
-    display: flex;
-    flex-direction: column;
-  }
-  header {
-    padding: 15px 25px;
-    background: #0d2538;
-    border-top-left-radius: 18px;
-    border-top-right-radius: 18px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: #61dafb;
-    font-weight: 700;
-    font-size: 20px;
-  }
-  header .user-profile {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 500;
-    font-size: 16px;
-    color: #cfd8dc;
-  }
-  nav {
-    display: flex;
-    background: #0d2538;
-    padding: 10px 15px;
-    justify-content: space-around;
-    border-bottom: 2px solid #61dafb;
-  }
-  nav button {
-    background: transparent;
-    border: none;
-    color: #9bb7c0;
-    font-weight: 600;
-    font-size: 16px;
-    cursor: pointer;
-    padding: 12px 18px;
-    border-radius: 12px;
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
-  nav button.active,
-  nav button:hover {
-    background: #61dafb;
-    color: #142833;
-    box-shadow: 0 4px 12px rgba(97,218,251,0.7);
-  }
-  main {
-    flex: 1;
-    padding: 20px 30px;
-    overflow-y: auto;
-    background: #0d2538;
-    border-bottom-left-radius: 18px;
-    border-bottom-right-radius: 18px;
-    color: #ddd;
-  }
-  main section {
-    display: none;
-  }
-  main section.active {
-    display: block;
-  }
-  main section h2 {
-    margin-top: 0;
-    color: #61dafb;
-    font-weight: 700;
-    margin-bottom: 15px;
-    font-size: 22px;
-  }
-  form {
-    margin-bottom: 20px;
-  }
-  input[type="text"], textarea {
-    width: 100%;
-    padding: 10px 15px;
-    margin: 10px 0 15px 0;
-    border-radius: 10px;
-    border: none;
-    font-size: 16px;
-    background: #0f344f;
-    color: #eee;
-    box-shadow: inset 0 0 8px #153a5a;
-    resize: vertical;
-  }
-  input[type="text"]:focus, textarea:focus {
-    outline: none;
-    box-shadow: 0 0 8px #61dafb;
-  }
-  button.submit-btn {
-    background: #61dafb;
-    padding: 14px 25px;
-    border: none;
-    border-radius: 10px;
-    font-weight: 700;
-    font-size: 18px;
-    color: #142833;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  button.submit-btn:hover {
-    background: #21a1f1;
-  }
-  .list-item {
-    background: #15364f;
-    padding: 10px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-  }
-  .timestamp {
-    font-size: 0.8em;
-    color: #a0a0a0;
-    margin-top: 4px;
-  }
-  /* Scrollbar styling */
-  main::-webkit-scrollbar {
-    width: 8px;
-  }
-  main::-webkit-scrollbar-track {
-    background: #0d2538;
-  }
-  main::-webkit-scrollbar-thumb {
-    background: #61dafb;
-    border-radius: 4px;
-  }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מערכת ניהול - מלאה</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        /* CSS Variables for Dark Mode */
+        :root {
+            --bg-color: #1a1a2e;
+            --sidebar-bg: #16213e;
+            --card-bg: #0f3460;
+            --text-color: #e0e0e0;
+            --secondary-text-color: #a0a0a0;
+            --accent-color: #e94560;
+            --border-color: #0f3460;
+            --input-bg: #16213e;
+            --button-bg: #e94560;
+            --button-hover-bg: #c93450;
+            --form-bg: #16213e; /* רקע טופס */
+        }
+
+        /* Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            direction: rtl; /* Right-to-Left for Hebrew */
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: var(--sidebar-bg);
+            padding: 20px 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0; /* Prevents sidebar from shrinking */
+        }
+
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            padding: 0 20px 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 15px;
+        }
+
+        .sidebar-header .logo {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            margin-inline-end: 10px;
+            object-fit: cover;
+        }
+
+        .sidebar-header .system-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--accent-color);
+        }
+
+        .sidebar-nav ul {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            color: var(--secondary-text-color);
+            text-decoration: none;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .sidebar-nav a:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-color);
+        }
+
+        .sidebar-nav li.active a {
+            background-color: var(--card-bg);
+            color: var(--accent-color);
+            border-inline-start: 3px solid var(--accent-color);
+            font-weight: bold;
+        }
+
+        .sidebar-nav i {
+            margin-inline-end: 10px;
+            font-size: 1.1em;
+        }
+
+        .sidebar-nav .section-title {
+            color: var(--secondary-text-color);
+            font-size: 0.9em;
+            padding: 15px 20px 5px;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: var(--bg-color);
+            overflow-y: auto; /* Allow vertical scrolling */
+        }
+
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .main-header h1 {
+            font-size: 1.8em;
+            color: var(--text-color);
+        }
+
+        /* Content Sections */
+        .content-section {
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            min-height: calc(100vh - 120px); /* Adjust based on header/footer */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-section.hidden {
+            display: none;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-header h2 {
+            font-size: 1.5em;
+            color: var(--text-color);
+        }
+
+        /* General form/input/button styles */
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        input[type="time"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            color: var(--text-color);
+            font-size: 1em;
+            resize: vertical; /* Allow vertical resize for textareas */
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(233, 69, 96, 0.3);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--secondary-text-color);
+        }
+
+        button {
+            background-color: var(--button-bg);
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            background-color: var(--button-hover-bg);
+        }
+
+        .add-new-button {
+            background-color: var(--accent-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .add-new-button:hover {
+            background-color: var(--button-hover-bg);
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        }
+
+        .search-bar input {
+            flex-grow: 1;
+        }
+
+        .search-bar button {
+            flex-shrink: 0;
+        }
+
+        /* Table styles */
+        .data-table-container {
+            overflow-x: auto;
+            flex-grow: 1; /* Allows table to take available space */
+            margin-top: 15px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 700px; /* Ensure minimum width for wide tables */
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px 15px;
+            text-align: right;
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        .data-table th {
+            background-color: var(--sidebar-bg);
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        .actions-cell {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+        }
+
+        .action-button {
+            background: none;
+            border: none;
+            color: var(--secondary-text-color);
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: color 0.3s;
+            padding: 5px;
+        }
+
+        .action-button:hover {
+            color: var(--accent-color);
+        }
+
+        /* Form specific styles (e.g., for new report/charge) */
+        .form-container {
+            background-color: var(--form-bg);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin-top: 20px;
+            max-width: 800px; /* Limit form width */
+            margin-inline: auto; /* Center the form */
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 250px; /* Minimum width for each group */
+        }
+
+        .form-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .form-buttons button.cancel-button {
+            background-color: var(--secondary-text-color);
+        }
+        .form-buttons button.cancel-button:hover {
+            background-color: #777;
+        }
+
+        /* Specific styles for Reports section */
+        .reports-layout {
+            display: flex;
+            gap: 20px;
+            flex-grow: 1;
+        }
+
+        .reports-list-panel {
+            flex-basis: 300px; /* Fixed width for the list panel */
+            background-color: var(--form-bg); /* Use form-bg for list background */
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .reports-list-panel .search-bar {
+            margin-bottom: 10px;
+        }
+
+        .reports-list {
+            list-style: none;
+            padding: 0;
+            flex-grow: 1;
+        }
+
+        .reports-list li {
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .reports-list li:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .reports-list li.active {
+            background-color: var(--card-bg);
+            border-inline-start: 3px solid var(--accent-color);
+        }
+
+        .report-summary-title {
+            font-weight: bold;
+            color: var(--text-color);
+            margin-bottom: 5px;
+        }
+
+        .report-summary-date {
+            font-size: 0.8em;
+            color: var(--secondary-text-color);
+        }
+
+        .reports-detail-panel {
+            flex-grow: 1;
+            background-color: var(--form-bg); /* Use form-bg for detail background */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .reports-detail-panel h3 {
+            color: var(--accent-color);
+            margin-bottom: 15px;
+        }
+
+        .reports-detail-panel .detail-field {
+            margin-bottom: 10px;
+        }
+
+        .reports-detail-panel .detail-field strong {
+            color: var(--text-color);
+            margin-inline-end: 5px;
+        }
+        .reports-detail-panel .detail-field span {
+            color: var(--secondary-text-color);
+        }
+
+        /* Staff / Roster / Vehicle / Evidence grid display */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .card-item {
+            background-color: var(--form-bg);
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .card-item img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 10px;
+            border: 2px solid var(--accent-color);
+        }
+        .card-item .default-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: var(--input-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 3em;
+            color: var(--secondary-text-color);
+        }
+
+        .card-item strong {
+            color: var(--text-color);
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .card-item span {
+            color: var(--secondary-text-color);
+            font-size: 0.9em;
+            margin-bottom: 3px;
+        }
+
+        .card-item .action-button {
+            margin-top: 10px;
+        }
+
+        /* Specific styles for Bolo/Warrants */
+        .bolo-warrant-item {
+            background-color: var(--form-bg);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-inline-start: 4px solid var(--accent-color);
+        }
+        .bolo-warrant-item h3 {
+            margin-top: 0;
+            color: var(--text-color);
+            font-size: 1.2em;
+            margin-bottom: 8px;
+        }
+        .bolo-warrant-item p {
+            margin-bottom: 5px;
+            font-size: 0.95em;
+            color: var(--secondary-text-color);
+        }
+        .bolo-warrant-item .bolo-meta {
+            font-size: 0.85em;
+            color: #888;
+            border-top: 1px solid var(--border-color);
+            padding-top: 8px;
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .bolo-warrant-item .action-buttons-bolo {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+            justify-content: flex-end;
+        }
+
+    </style>
 </head>
 <body>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="https://via.placeholder.com/60" alt="לוגו" class="logo">
+                <span class="system-title">מערכת ניהול</span>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li><a href="#" data-section="dashboard"><i class="fas fa-tachometer-alt"></i> דאשבורד</a></li>
+                    <li><a href="#" data-section="citizens"><i class="fas fa-users"></i> אזרחים</a></li>
+                    <li><a href="#" data-section="incidents"><i class="fas fa-exclamation-triangle"></i> אירועים</a></li>
+                    <li><a href="#" data-section="reports"><i class="fas fa-file-alt"></i> דוחות</a></li>
+                    <li><a href="#" data-section="bolos-warrants"><i class="fas fa-gavel"></i> צווי מעצר & Bolos</a></li>
+                    <li><a href="#" data-section="vehicles"><i class="fas fa-car"></i> כלי רכב</a></li>
+                    <li><a href="#" data-section="evidence"><i class="fas fa-box"></i> ראיות</a></li>
+                    <li><a href="#" data-section="cameras"><i class="fas fa-video"></i> מצלמות</a></li>
+                    <li><a href="#" data-section="weapon-registry"><i class="fas fa-gun"></i> רישום כלי נשק</a></li>
+                    <li><a href="#" data-section="legislations"><i class="fas fa-balance-scale"></i> חקיקה</a></li>
+                    <li class="section-title">צוות</li>
+                    <li><a href="#" data-section="staff"><i class="fas fa-user-tie"></i> צוות</a></li>
+                    <li><a href="#" data-section="sop"><i class="fas fa-book"></i> SOP</a></li>
+                    <li><a href="#" data-section="roster"><i class="fas fa-list-alt"></i> רוסטר</a></li>
+                    <li><a href="#" data-section="academy-sheet"><i class="fas fa-graduation-cap"></i> גיליון אקדמיה</a></li>
+                    <li><a href="#" data-section="disciplinary-database"><i class="fas fa-ban"></i> מאגר משמעתי</a></li>
+                    <li><a href="#" data-section="codes-commands"><i class="fas fa-code"></i> 10 קודים & פקודות</a></li>
+                    <li class="active"><a href="#" data-section="charges"><i class="fas fa-handcuffs"></i> אישומים</a></li>
+                </ul>
+            </nav>
+        </aside>
 
-<!-- Login Screen -->
-<div id="loginScreen" class="screen active">
-  <div id="loginBox">
-    <h1>התחבר למערכת</h1>
-    <input type="text" id="usernameInput" placeholder="שם משתמש" autocomplete="off" />
-    <input type="password" id="passwordInput" placeholder="סיסמה" autocomplete="off" />
-    <button id="loginBtn">התחבר</button>
-    <div id="loginError"></div>
-  </div>
-</div>
+        <main class="main-content">
+            <header class="main-header">
+                <h1 id="current-section-title">אישומים</h1>
+                <div class="header-actions">
+                    </div>
+            </header>
 
-<!-- Tablet Screen -->
-<div id="tabletScreen" class="screen">
-  <header>
-    <div>טאבלט משטרתי</div>
-    <div class="user-profile" id="userDisplay">
-      משתמש: <span id="loggedUser"></span>
-      &nbsp;|&nbsp;
-      <button style="background:none; border:none; color:#61dafb; cursor:pointer; font-weight:600;" id="logoutBtn">התנתק</button>
+            <section id="charges-section" class="content-section active">
+                <div class="section-header">
+                    <h2>אישומים</h2>
+                    <button id="addChargeBtn" class="add-new-button"><i class="fas fa-plus"></i> צור אישום חדש</button>
+                </div>
+
+                <div class="search-bar">
+                    <input type="text" id="chargeSearch" placeholder="חיפוש אישום...">
+                    <button><i class="fas fa-search"></i> חפש</button>
+                </div>
+
+                <div class="data-table-container">
+                    <table class="data-table" id="chargesTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>כותרת</th>
+                                <th>תיאור</th>
+                                <th>קנס ($)</th>
+                                <th>מאסר (חודשים)</th>
+                                <th>נקודות</th>
+                                <th>פעולות</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                </div>
+
+                <div id="chargeFormContainer" class="form-container hidden" style="margin-top: 30px;">
+                    <h3>צור/ערוך אישום</h3>
+                    <form id="chargeForm">
+                        <input type="hidden" id="chargeId">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="chargeTitle">כותרת:</label>
+                                <input type="text" id="chargeTitle" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="chargeFine">קנס ($):</label>
+                                <input type="number" id="chargeFine" required min="0">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="chargeJail">מאסר (חודשים):</label>
+                                <input type="number" id="chargeJail" required min="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="chargePoints">נקודות:</label>
+                                <input type="number" id="chargePoints" required min="0">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="chargeDescription">תיאור:</label>
+                            <textarea id="chargeDescription" rows="4"></textarea>
+                        </div>
+                        <div class="form-buttons">
+                            <button type="submit"><i class="fas fa-save"></i> שמור אישום</button>
+                            <button type="button" id="cancelChargeForm" class="cancel-button"><i class="fas fa-times"></i> בטל</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <section id="reports-section" class="content-section hidden">
+                <div class="section-header">
+                    <h2>דוחות</h2>
+                    <button id="addReportBtn" class="add-new-button"><i class="fas fa-plus"></i> צור דוח חדש</button>
+                </div>
+
+                <div class="reports-layout">
+                    <div class="reports-list-panel">
+                        <div class="search-bar">
+                            <input type="text" id="reportSearch" placeholder="חיפוש דוח...">
+                            <button><i class="fas fa-search"></i> חפש</button>
+                        </div>
+                        <ul class="reports-list" id="reportsList">
+                            </ul>
+                    </div>
+                    <div class="reports-detail-panel" id="reportDetailPanel">
+                        <h3>בחר דוח לצפייה או צור דוח חדש</h3>
+                        </div>
+                </div>
+            </section>
+
+            <section id="bolos-warrants-section" class="content-section hidden">
+                <div class="section-header">
+                    <h2>צווי מעצר & Bolos</h2>
+                    <button id="addBoloWarrantBtn" class="add-new-button"><i class="fas fa-plus"></i> צור חדש</button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="boloWarrantSearch" placeholder="חיפוש לפי נושא/תיאור...">
+                    <button><i class="fas fa-search"></i> חפש</button>
+                </div>
+                <div id="boloWarrantList">
+                    </div>
+                <div id="boloFormContainer" class="form-container hidden" style="margin-top: 30px;">
+                    <h3>צור/ערוך Bolo/צו מעצר</h3>
+                    <form id="boloForm">
+                        <input type="hidden" id="boloId">
+                        <div class="form-group">
+                            <label for="boloType">סוג:</label>
+                            <select id="boloType">
+                                <option value="BOLO">BOLO</option>
+                                <option value="WARRANT">צו מעצר</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="boloSubject">נושא (שם, רכב, חפץ):</label>
+                            <input type="text" id="boloSubject" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="boloDescription">תיאור:</label>
+                            <textarea id="boloDescription" rows="4"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="boloIssuedBy">הונפק על ידי:</label>
+                            <input type="text" id="boloIssuedBy" required>
+                        </div>
+                        <div class="form-buttons">
+                            <button type="submit"><i class="fas fa-save"></i> שמור</button>
+                            <button type="button" id="cancelBoloForm" class="cancel-button"><i class="fas fa-times"></i> בטל</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <section id="vehicles-section" class="content-section hidden">
+                <div class="section-header">
+                    <h2>כלי רכב</h2>
+                    <button id="addVehicleBtn" class="add-new-button"><i class="fas fa-plus"></i> הוסף רכב</button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="vehicleSearch" placeholder="חיפוש רכב (מספר, דגם, צבע)...">
+                    <button><i class="fas fa-search"></i> חפש</button>
+                </div>
+                <div class="cards-grid" id="vehicleGrid">
+                    </div>
+            </section>
+
+            <section id="evidence-section" class="content-section hidden">
+                <div class="section-header">
+                    <h2>ראיות</h2>
+                    <button id="addEvidenceBtn" class="add-new-button"><i class="fas fa-plus"></i> הוסף ראיה</button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="evidenceSearch" placeholder="חיפוש ראיה (פריט, תיאור, קייס)...">
+                    <button><i class="fas fa-search"></i> חפש</button>
+                </div>
+                <div class="data-table-container">
+                    <table class="data-table" id="evidenceTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>פריט</th>
+                                <th>תיאור</th>
+                                <th>מספר קייס</th>
+                                <th>תאריך נאסף</th>
+                                <th>נאסף ע"י</th>
+                                <th>פעולות</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="weapon-registry-section" class="content-section hidden">
+                <div class="section-header">
+                    <h2>רישום כלי נשק</h2>
+                    <button id="addWeaponBtn" class="add-new-button"><i class="fas fa-plus"></i> הוסף נשק</button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="weaponSearch" placeholder="חיפוש נשק (דגם, מספר סידורי, בעלים)...">
+                    <button><i class="fas fa-search"></i> חפש</button>
+                </div>
+                <div class="data-table-container">
+                    <table class="data-table" id="weaponTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>דגם</th>
+                                <th>סוג</th>
+                                <th>מספר סידורי</th>
+                                <th>בעלים</th>
+                                <th>סטטוס</th>
+                                <th>פעולות</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="staff-section" class="content-section hidden">
+                <div class="section-header">
+                    <h2>צוות</h2>
+                    <button id="addStaffBtn" class="add-new-button"><i class="fas fa-plus"></i> הוסף איש צוות</button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="staffSearch" placeholder="חיפוש לפי שם, דרגה...">
+                    <button><i class="fas fa-search"></i> חפש</button>
+                </div>
+                <div class="cards-grid" id="staffGrid">
+                    </div>
+            </section>
+
+            <section id="roster-section" class="content-section hidden">
+                <div class="section-header">
+                    <h2>רוסטר</h2>
+                    <button id="addRosterEntryBtn" class="add-new-button"><i class="fas fa-plus"></i> הוסף לרוסטר</button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="rosterSearch" placeholder="חיפוש רוסטר (שם, מחלקה)...">
+                    <button><i class="fas fa-search"></i> חפש</button>
+                </div>
+                <div class="data-table-container">
+                    <table class="data-table" id="rosterTable">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>מזהה מדינה</th>
+                                <th>שם מלא</th>
+                                <th>מחלקה</th>
+                                <th>דרגה</th>
+                                <th>סטטוס</th>
+                                <th>זמן במשמרת</th>
+                                <th>פעולות</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="codes-commands-section" class="content-section hidden">
+                <div class="section-header">
+                    <h2>10 קודים & פקודות</h2>
+                    <button id="addCodeCommandBtn" class="add-new-button"><i class="fas fa-plus"></i> הוסף קוד/פקודה</button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="codeCommandSearch" placeholder="חיפוש קוד או פקודה...">
+                    <button><i class="fas fa-search"></i> חפש</button>
+                </div>
+                <div class="data-table-container">
+                    <table class="data-table" id="codesCommandsTable">
+                        <thead>
+                            <tr>
+                                <th>קוד</th>
+                                <th>תיאור</th>
+                                <th>פעולות</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="dashboard-section" class="content-section hidden">
+                <h2>דאשבורד</h2>
+                <p>ברוך הבא לדאשבורד! כאן תוצג סקירה כללית של המערכת.</p>
+            </section>
+            <section id="citizens-section" class="content-section hidden">
+                <div class="section-header">
+                    <h2>אזרחים</h2>
+                    <button id="addCitizenBtn" class="add-new-button"><i class="fas fa-plus"></i> הוסף אזרח</button>
+                </div>
+                <p>ניהול פרטי אזרחים.</p>
+                </section>
+            <section id="incidents-section" class="content-section hidden">
+                <h2>אירועים</h2>
+                <p>תיעוד וניהול אירועים.</p>
+            </section>
+            <section id="cameras-section" class="content-section hidden">
+                <h2>מצלמות</h2>
+                <p>ניהול מצלמות אבטחה.</p>
+            </section>
+            <section id="legislations-section" class="content-section hidden">
+                <h2>חקיקה</h2>
+                <p>בסיס נתונים של חוקים ותקנות.</p>
+            </section>
+            <section id="sop-section" class="content-section hidden">
+                <h2>SOP</h2>
+                <p>נהלי הפעלה סטנדרטיים.</p>
+            </section>
+            <section id="academy-sheet-section" class="content-section hidden">
+                <h2>גיליון אקדמיה</h2>
+                <p>מעקב אחר הכשרות וקורסים.</p>
+            </section>
+            <section id="disciplinary-database-section" class="content-section hidden">
+                <h2>מאגר משמעתי</h2>
+                <p>ניהול עבירות משמעתיות.</p>
+            </section>
+
+        </main>
     </div>
-  </header>
-  <nav>
-    <button class="nav-btn active" data-target="registration">רישום</button>
-    <button class="nav-btn" data-target="chase">רדיפה</button>
-    <button class="nav-btn" data-target="backup">גיבוי</button>
-    <button class="nav-btn" data-target="search">בדיקה</button>
-    <button class="nav-btn" data-target="report">דוח</button>
-  </nav>
-  <main>
-    <section id="registration" class="active">
-      <h2>רישום שוטרים</h2>
-      <form id="registrationForm">
-        <input type="text" name="name" placeholder="שם מלא" required />
-        <input type="text" name="unit" placeholder="יחידה" required />
-        <button type="submit" class="submit-btn">שלח רישום</button>
-      </form>
-      <div id="registrationList"></div>
-    </section>
 
-    <section id="chase">
-      <h2>דיווח על רדיפה</h2>
-      <form id="chaseForm">
-        <input type="text" name="suspect" placeholder="שם החשוד" required />
-        <input type="text" name="vehicle" placeholder="רכב החשוד" required />
-        <button type="submit" class="submit-btn">דווח על רדיפה</button>
-      </form>
-      <div id="chaseList"></div>
-    </section>
+    <script>
+        // --- JavaScript Global Variables and Utility Functions ---
+        const navLinks = document.querySelectorAll('.sidebar-nav a');
+        const contentSections = document.querySelectorAll('.content-section');
+        const currentSectionTitle = document.getElementById('current-section-title');
 
-    <section id="backup">
-      <h2>בקשת גיבוי</h2>
-      <form id="backupForm">
-        <input type="text" name="location" placeholder="מיקום" required />
-        <input type="text" name="reason" placeholder="סיבה" required />
-        <button type="submit" class="submit-btn">בקש גיבוי</button>
-      </form>
-      <div id="backupList"></div>
-    </section>
+        // Discord Webhook URLs - CONFIGURED BY AI
+        const WEBHOOK_URLS = {
+            reports: 'https://discord.com/api/webhooks/1378450504245575786/N64N9hoRFgw_d6qG-VQTvEsCi2ZuMD2JdyV4-lGb_eS1u3NpKV_1zyPOSeXZa0Gq23jH',
+            citizens: 'https://discord.com/api/webhooks/1378494867310907522/_3B2GQcHbPPaagmFyN877DGO05W2j2F9Jb8STdNs8GMn5Re_xqBpg_6rOul4M0tgCZar',
+            bolosWarrants: 'https://discord.com/api/webhooks/1378494950278430770/1bsyeUy1kCBHzWqhihVy7YEDc0NKuLjSlMp07jYZCVgXdlE9Aqpwil7mqrrmKjOdPruU',
+            vehicles: 'https://discord.com/api/webhooks/1378495174459523073/y_TkwouVSwuVz1mRLBoVQv7rAUdBbtXoxLxjFEN7BW5wGYLi9GVw4RMLJ3fLYoyLgzPL',
+            evidence: 'https://discord.com/api/webhooks/1378495259524337716/zlTX8yWQvUXM7fCth32JiK6H7C2y03knjLBkyKLmmOLhBBQtbRH-gpNdOboFNQP9h05A',
+            weaponRegistry: 'https://discord.com/api/webhooks/1378495349257142442/GFA4zJPaibXxU2QJwvzGhwVhb_mbpXzqxKo1Z2asz1OucakhfBgEzuCumw8aRK3P--_-', // UPDATED
+            staff: 'https://discord.com/api/webhooks/1378495438034043171/tqJgIHIHoFy0vkhPjhTsxGO4EtLVev7Ag9SL49rZHWcJPsrYePdvux-J_yJIoRkRQpQ8',
+            roster: 'https://discord.com/api/webhooks/1378495652371235037/PRC2l6N2Zi6sGn5zhEP9azHpwMEpxWzQMq-CBzlmtXePGxiFdzH-wnnBnU-5YIRVtEPf', // UPDATED
+            codesCommands: 'https://discord.com/api/webhooks/1378495805240905898/WjENCUwC9-F_5BKq2_m274R_HFU0SWyOb3Jh5JGUB7Z9iBKRId3cFGfSUUhRdxvZges_',
+            charges: 'https://discord.com/api/webhooks/1378495876825350195/kLfFQNnvoltNuhtoq76Ia95OcNJ9JEpC-cKtRxoUqVp1-rTXCwPdhcqFjCfc0o99HonI'
+        };
 
-    <section id="search">
-      <h2>בדיקות וחקירות</h2>
-      <form id="searchForm">
-        <input type="text" name="query" placeholder="מה לבדוק?" required />
-        <button type="submit" class="submit-btn">בדוק</button>
-      </form>
-      <div id="searchList"></div>
-    </section>
 
-    <section id="report">
-      <h2>דוחות</h2>
-      <form id="reportForm">
-        <textarea name="description" placeholder="פרטי הדוח" required></textarea>
-        <button type="submit" class="submit-btn">שלח דוח</button>
-      </form>
-      <div id="reportList"></div>
-    </section>
-  </main>
-</div>
+        // Helper to show/hide sections
+        function showSection(sectionId) {
+            contentSections.forEach(section => {
+                if (section.id === sectionId) {
+                    section.classList.remove('hidden');
+                    section.classList.add('active');
+                } else {
+                    section.classList.add('hidden');
+                    section.classList.remove('active');
+                }
+            });
+        }
 
-<!-- Firebase Scripts -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script>
-  // Firebase configuration - החלף בפרטים שלך אם יש צורך
-  const firebaseConfig = {
-    apiKey: "AIzaSyAAADd1lL5cgTgTxQOC8VSrjLlIsDlRyIk",
-    authDomain: "policereportsystem-f23fd.firebaseapp.com",
-    projectId: "policereportsystem-f23fd",
-    storageBucket: "policereportsystem-f23fd.appspot.com",
-    messagingSenderId: "93022201022",
-    appId: "1:93022201022:web:b33be966dcac2ce8612aef"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
+        // Helper to update main header title
+        function updateMainHeaderTitle(title) {
+            currentSectionTitle.textContent = title;
+        }
 
-  // התחברות - משתמש וסיסמה קשיחים
-  const USERNAME = "officer";
-  const PASSWORD = "1234";
+        /**
+         * Sends a message to a Discord channel via Webhook.
+         * @param {string} webhookUrl The specific Webhook URL to send the message to.
+         * @param {string} message The content of the message.
+         * @param {string} username Optional: The username to display for the webhook.
+         * @param {string} avatar_url Optional: URL to an avatar image for the webhook.
+         */
+        async function sendDiscordMessage(webhookUrl, message, username = 'מערכת ניהול', avatar_url = 'https://via.placeholder.com/60') {
+            if (!webhookUrl) {
+                console.error("Discord Webhook URL is missing for this operation.");
+                alert("שגיאה: Webhook של דיסקורד אינו מוגדר עבור פעולה זו.");
+                return;
+            }
 
-  const loginScreen = document.getElementById("loginScreen");
-  const tabletScreen = document.getElementById("tabletScreen");
-  const loginError = document.getElementById("loginError");
-  const usernameInput = document.getElementById("usernameInput");
-  const passwordInput = document.getElementById("passwordInput");
-  const loggedUserSpan = document.getElementById("loggedUser");
-  const logoutBtn = document.getElementById("logoutBtn");
+            const payload = {
+                content: message,
+                username: username,
+                avatar_url: avatar_url
+            };
 
-  document.getElementById("loginBtn").onclick = () => {
-    const user = usernameInput.value.trim();
-    const pass = passwordInput.value.trim();
-    if (user === USERNAME && pass === PASSWORD) {
-      loginError.textContent = "";
-      loggedUserSpan.textContent = user;
-      loginScreen.classList.remove("active");
-      tabletScreen.classList.add("active");
-    } else {
-      loginError.textContent = "שם משתמש או סיסמה שגויים";
-    }
-  };
+            try {
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
 
-  logoutBtn.onclick = () => {
-    tabletScreen.classList.remove("active");
-    loginScreen.classList.add("active");
-    usernameInput.value = "";
-    passwordInput.value = "";
-  };
+                if (response.ok) {
+                    console.log(`הודעה נשלחה לדיסקורד בהצלחה! (Webhook: ${webhookUrl.substring(0, 50)}...)`);
+                } else {
+                    const errorText = await response.text();
+                    console.error('שגיאה בשליחת הודעה לדיסקורד:', response.status, response.statusText, errorText);
+                    alert(`שגיאה בשליחת הודעה לדיסקורד: ${response.status} - ${errorText}`);
+                }
+            } catch (error) {
+                console.error('שגיאה ברשת או בבקשה לדיסקורד:', error);
+                alert(`שגיאה בתקשורת עם דיסקורד: ${error.message}`);
+            }
+        }
 
-  // ניווט בין הכרטיסיות
-  const navButtons = document.querySelectorAll("nav button");
-  const sections = document.querySelectorAll("main section");
 
-  navButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      navButtons.forEach(b => b.classList.remove("active"));
-      sections.forEach(s => s.classList.remove("active"));
-      btn.classList.add("active");
-      document.getElementById(btn.dataset.target).classList.add("active");
-    });
-  });
+        // --- Event Listeners for Navigation ---
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const sectionId = this.dataset.section + '-section';
+                const sectionTitle = this.textContent.trim(); // Get the text content of the link
 
-  // פונקציה לשליחת טפסים ל-Firebase
-  function submitToFirebase(formId, collectionName) {
-    const form = document.getElementById(formId);
-    form.addEventListener("submit", e => {
-      e.preventDefault();
-      const data = {};
-      Array.from(form.elements).forEach(el => {
-        if (el.name) data[el.name] = el.value.trim();
-      });
-      data.timestamp = firebase.firestore.FieldValue.serverTimestamp();
-      db.collection(collectionName).add(data)
-        .then(() => {
-          form.reset();
-        })
-        .catch(err => {
-          alert("שגיאה בשליחת הנתונים: " + err.message);
+                // Remove active class from all nav links
+                navLinks.forEach(nav => nav.parentElement.classList.remove('active'));
+                // Add active class to the clicked link's parent <li>
+                this.parentElement.classList.add('active');
+
+                updateMainHeaderTitle(sectionTitle);
+                showSection(sectionId);
+            });
         });
-    });
-  }
 
-  submitToFirebase("registrationForm", "registration");
-  submitToFirebase("chaseForm", "chases");
-  submitToFirebase("backupForm", "backups");
-  submitToFirebase("searchForm", "searches");
-  submitToFirebase("reportForm", "reports");
+        // --- Charges Section Logic ---
+        const charges = []; // In-memory storage for charges
+        const chargesTableBody = document.querySelector('#chargesTable tbody');
+        const chargeFormContainer = document.getElementById('chargeFormContainer');
+        const addChargeBtn = document.getElementById('addChargeBtn');
+        const cancelChargeFormBtn = document.getElementById('cancelChargeForm');
+        const chargeForm = document.getElementById('chargeForm');
 
-  // פונקציה להצגת רשימות בזמן אמת
-  function renderList(collectionName, containerId, formatter) {
-    const container = document.getElementById(containerId);
-    db.collection(collectionName).orderBy("timestamp", "desc").onSnapshot(snapshot => {
-      container.innerHTML = "";
-      if (snapshot.empty) {
-        container.innerHTML = "<p>אין פריטים להצגה כרגע.</p>";
-        return;
-      }
-      snapshot.forEach(doc => {
-        const d = doc.data();
-        const ts = d.timestamp ? d.timestamp.toDate().toLocaleString("he-IL") : "---";
-        const div = document.createElement("div");
-        div.className = "list-item";
-        div.innerHTML = formatter(d, ts);
-        container.appendChild(div);
-      });
-    });
-  }
+        // Function to render charges table
+        function renderCharges() {
+            chargesTableBody.innerHTML = ''; // Clear existing rows
+            charges.forEach((charge, index) => {
+                const row = chargesTableBody.insertRow();
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${charge.title}</td>
+                    <td>${charge.description}</td>
+                    <td>$${charge.fine}</td>
+                    <td>${charge.jail}</td>
+                    <td>${charge.points}</td>
+                    <td class="actions-cell">
+                        <button class="action-button edit-charge" data-id="${charge.id}" title="ערוך"><i class="fas fa-edit"></i></button>
+                        <button class="action-button delete-charge" data-id="${charge.id}" title="מחק"><i class="fas fa-trash-alt"></i></button>
+                    </td>
+                `;
+            });
+        }
 
-  renderList("registration", "registrationList", (d, ts) =>
-    `<strong>שם:</strong> ${d.name} | <strong>יחידה:</strong> ${d.unit}<div class="timestamp">${ts}</div>`
-  );
-  renderList("chases", "chaseList", (d, ts) =>
-    `<strong>חשוד:</strong> ${d.suspect} | <strong>רכב:</strong> ${d.vehicle}<div class="timestamp">${ts}</div>`
-  );
-  renderList("backups", "backupList", (d, ts) =>
-    `<strong>מיקום:</strong> ${d.location} | <strong>סיבה:</strong> ${d.reason}<div class="timestamp">${ts}</div>`
-  );
-  renderList("searches", "searchList", (d, ts) =>
-    `<strong>חיפוש:</strong> ${d.query}<div class="timestamp">${ts}</div>`
-  );
-  renderList("reports", "reportList", (d, ts) =>
-    `<strong>דוח:</strong> ${d.description}<div class="timestamp">${ts}</div>`
-  );
-</script>
+        // Show add/edit charge form
+        addChargeBtn.addEventListener('click', () => {
+            chargeForm.reset(); // Clear form
+            document.getElementById('chargeId').value = ''; // Clear ID for new charge
+            chargeFormContainer.classList.remove('hidden');
+        });
 
+        // Cancel charge form
+        cancelChargeFormBtn.addEventListener('click', () => {
+            chargeFormContainer.classList.add('hidden');
+        });
+
+        // Handle charge form submission
+        chargeForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const id = document.getElementById('chargeId').value || `charge-${Date.now()}`;
+            const title = document.getElementById('chargeTitle').value;
+            const description = document.getElementById('chargeDescription').value;
+            const fine = document.getElementById('chargeFine').value;
+            const jail = document.getElementById('chargeJail').value;
+            const points = document.getElementById('chargePoints').value;
+
+            const newCharge = { id, title, description, fine, jail, points };
+
+            let message;
+            const existingIndex = charges.findIndex(c => c.id === id);
+            if (existingIndex > -1) {
+                charges[existingIndex] = newCharge; // Update existing
+                message = `**אישום עודכן:**\nכותרת: ${title}\nקנס: $${fine}, מאסר: ${jail} חודשים, נקודות: ${points}\nתיאור: ${description}`;
+            } else {
+                charges.push(newCharge); // Add new
+                message = `**אישום חדש נוצר:**\nכותרת: ${title}\nקנס: $${fine}, מאסר: ${jail} חודשים, נקודות: ${points}\nתיאור: ${description}`;
+            }
+
+            renderCharges();
+            chargeFormContainer.classList.add('hidden');
+
+            await sendDiscordMessage(WEBHOOK_URLS.charges, message, 'מערכת אישומים');
+        });
+
+        // Handle edit/delete from table
+        chargesTableBody.addEventListener('click', async function(event) {
+            if (event.target.closest('.edit-charge')) {
+                const chargeId = event.target.closest('button').dataset.id;
+                const chargeToEdit = charges.find(c => c.id === chargeId);
+                if (chargeToEdit) {
+                    document.getElementById('chargeId').value = chargeToEdit.id;
+                    document.getElementById('chargeTitle').value = chargeToEdit.title;
+                    document.getElementById('chargeDescription').value = chargeToEdit.description;
+                    document.getElementById('chargeFine').value = chargeToEdit.fine;
+                    document.getElementById('chargeJail').value = chargeToEdit.jail;
+                    document.getElementById('chargePoints').value = chargeToEdit.points;
+                    chargeFormContainer.classList.remove('hidden');
+                }
+            } else if (event.target.closest('.delete-charge')) {
+                const chargeId = event.target.closest('button').dataset.id;
+                if (confirm('האם אתה בטוח שברצונך למחוק אישום זה?')) {
+                    const deletedCharge = charges.splice(charges.findIndex(c => c.id === chargeId), 1)[0];
+                    renderCharges();
+                    const message = `**אישום נמחק:**\nכותרת: ${deletedCharge.title}\nקנס: $${deletedCharge.fine}, מאסר: ${deletedCharge.jail} חודשים, נקודות: ${deletedCharge.points}`;
+                    await sendDiscordMessage(WEBHOOK_URLS.charges, message, 'מערכת אישומים');
+                }
+            }
+        });
+
+
+        // Initial render for Charges (if any pre-defined charges)
+        renderCharges();
+
+
+        // --- Reports Section Logic ---
+        const reports = []; // In-memory storage for reports
+        const reportsList = document.getElementById('reportsList');
+        const reportDetailPanel = document.getElementById('reportDetailPanel');
+        const addReportBtn = document.getElementById('addReportBtn');
+
+        // Function to render reports list
+        function renderReportsList() {
+            reportsList.innerHTML = '';
+            reports.forEach(report => {
+                const li = document.createElement('li');
+                li.dataset.id = report.id;
+                li.innerHTML = `
+                    <div>
+                        <div class="report-summary-title">${report.title}</div>
+                        <div class="report-summary-date">${report.date}</div>
+                    </div>
+                    <div class="actions-cell">
+                        <button class="action-button edit-report" data-id="${report.id}" title="ערוך"><i class="fas fa-edit"></i></button>
+                        <button class="action-button delete-report" data-id="${report.id}" title="מחק"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                `;
+                reportsList.appendChild(li);
+            });
+        }
+
+        // Function to display report details (you'll need to create a form/display for this)
+        function displayReportDetails(report) {
+            if (!report) {
+                reportDetailPanel.innerHTML = '<h3>בחר דוח לצפייה או צור דוח חדש</h3>';
+                return;
+            }
+            reportDetailPanel.innerHTML = `
+                <h3>${report.title}</h3>
+                <div class="detail-field"><strong>תאריך:</strong> <span>${report.date}</span></div>
+                <div class="detail-field"><strong>כתב:</strong> <span>${report.reporter}</span></div>
+                <div class="detail-field"><strong>תוכן:</strong> <span>${report.content}</span></div>
+                <div class="form-buttons">
+                    <button class="action-button edit-report" data-id="${report.id}"><i class="fas fa-edit"></i> ערוך דוח</button>
+                    <button class="action-button delete-report" data-id="${report.id}"><i class="fas fa-trash-alt"></i> מחק דוח</button>
+                </div>
+            `;
+            // Remove active class from all list items
+            document.querySelectorAll('.reports-list li').forEach(item => item.classList.remove('active'));
+            // Add active class to the selected list item
+            document.querySelector(`.reports-list li[data-id="${report.id}"]`).classList.add('active');
+        }
+
+        // Handle adding a new report (simplified for demonstration)
+        addReportBtn.addEventListener('click', async () => {
+            const newReportTitle = prompt('הכנס כותרת לדוח חדש:');
+            if (newReportTitle) {
+                const newReportContent = prompt('הכנס תוכן לדוח:');
+                const reporterName = prompt('הכנס שם הכתב:');
+                const newReport = {
+                    id: `report-${Date.now()}`,
+                    title: newReportTitle,
+                    date: new Date().toLocaleDateString('he-IL'),
+                    reporter: reporterName || 'לא ידוע',
+                    content: newReportContent || 'אין תוכן'
+                };
+                reports.push(newReport);
+                renderReportsList();
+                displayReportDetails(newReport);
+
+                const message = `**דוח מערכת חדש נוצר:**\nכותרת: ${newReport.title}\nנוצר ע"י: ${newReport.reporter}\nתאריך: ${newReport.date}`;
+                await sendDiscordMessage(WEBHOOK_URLS.reports, message, 'מערכת דוחות');
+            }
+        });
+
+        // Handle clicking on a report in the list or edit/delete buttons
+        reportsList.addEventListener('click', function(event) {
+            const listItem = event.target.closest('li');
+            if (listItem) {
+                const reportId = listItem.dataset.id;
+                const selectedReport = reports.find(r => r.id === reportId);
+                displayReportDetails(selectedReport);
+            }
+        });
+        reportDetailPanel.addEventListener('click', async function(event) {
+            if (event.target.closest('.edit-report')) {
+                const reportId = event.target.closest('button').dataset.id;
+                const reportToEdit = reports.find(r => r.id === reportId);
+                if (reportToEdit) {
+                    const updatedTitle = prompt('ערוך כותרת דוח:', reportToEdit.title);
+                    const updatedContent = prompt('ערוך תוכן דוח:', reportToEdit.content);
+                    const updatedReporter = prompt('ערוך שם כתב:', reportToEdit.reporter);
+
+                    if (updatedTitle !== null && updatedContent !== null && updatedReporter !== null) {
+                        reportToEdit.title = updatedTitle;
+                        reportToEdit.content = updatedContent;
+                        reportToEdit.reporter = updatedReporter;
+                        renderReportsList();
+                        displayReportDetails(reportToEdit);
+
+                        const message = `**דוח מערכת עודכן:**\nכותרת: ${reportToEdit.title}\nעודכן ע"י: ${reportToEdit.reporter}\nתאריך: ${reportToEdit.date}`;
+                        await sendDiscordMessage(WEBHOOK_URLS.reports, message, 'מערכת דוחות');
+                    }
+                }
+            } else if (event.target.closest('.delete-report')) {
+                const reportId = event.target.closest('button').dataset.id;
+                if (confirm('האם אתה בטוח שברצונך למחוק דוח זה?')) {
+                    const deletedReport = reports.splice(reports.findIndex(r => r.id === reportId), 1)[0];
+                    renderReportsList();
+                    displayReportDetails(null); // Clear detail panel
+                    const message = `**דוח מערכת נמחק:**\nכותרת: ${deletedReport.title}\nנוצר ע"י: ${deletedReport.reporter}`;
+                    await sendDiscordMessage(WEBHOOK_URLS.reports, message, 'מערכת דוחות');
+                }
+            }
+        });
+
+
+        // --- Bolo/Warrants Section Logic ---
+        const bolosWarrants = []; // In-memory storage
+        const boloWarrantListDiv = document.getElementById('boloWarrantList');
+        const addBoloWarrantBtn = document.getElementById('addBoloWarrantBtn');
+        const boloFormContainer = document.getElementById('boloFormContainer');
+        const cancelBoloFormBtn = document.getElementById('cancelBoloForm');
+        const boloForm = document.getElementById('boloForm');
+
+        function renderBolosWarrants() {
+            boloWarrantListDiv.innerHTML = '';
+            if (bolosWarrants.length === 0) {
+                boloWarrantListDiv.innerHTML = '<p style="text-align: center; color: var(--secondary-text-color);">אין צווי מעצר או Bolos זמינים.</p>';
+                return;
+            }
+            bolosWarrants.forEach(item => {
+                const div = document.createElement('div');
+                div.classList.add('bolo-warrant-item');
+                div.innerHTML = `
+                    <h3>${item.type}: ${item.subject}</h3>
+                    <p><strong>תיאור:</strong> ${item.description}</p>
+                    <div class="bolo-meta">
+                        <span>הונפק ע"י: ${item.issuedBy}</span>
+                        <span>תאריך הנפקה: ${item.issueDate}</span>
+                    </div>
+                    <div class="action-buttons-bolo">
+                        <button class="action-button edit-bolo" data-id="${item.id}" title="ערוך"><i class="fas fa-edit"></i> ערוך</button>
+                        <button class="action-button delete-bolo" data-id="${item.id}" title="מחק"><i class="fas fa-trash-alt"></i> מחק</button>
+                    </div>
+                `;
+                boloWarrantListDiv.appendChild(div);
+            });
+        }
+
+        addBoloWarrantBtn.addEventListener('click', () => {
+            boloForm.reset();
+            document.getElementById('boloId').value = '';
+            boloFormContainer.classList.remove('hidden');
+        });
+
+        cancelBoloFormBtn.addEventListener('click', () => {
+            boloFormContainer.classList.add('hidden');
+        });
+
+        boloForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const id = document.getElementById('boloId').value || `bolo-${Date.now()}`;
+            const type = document.getElementById('boloType').value;
+            const subject = document.getElementById('boloSubject').value;
+            const description = document.getElementById('boloDescription').value;
+            const issuedBy = document.getElementById('boloIssuedBy').value;
+            const issueDate = new Date().toLocaleDateString('he-IL');
+
+            const newBolo = { id, type, subject, description, issuedBy, issueDate };
+
+            let message;
+            const existingIndex = bolosWarrants.findIndex(b => b.id === id);
+            if (existingIndex > -1) {
+                bolosWarrants[existingIndex] = newBolo; // Update existing
+                message = `**צו מעצר/BOLO עודכן:**\nסוג: ${type}, נושא: ${subject}\nהונפק ע"י: ${issuedBy}\nתיאור: ${description}`;
+            } else {
+                bolosWarrants.push(newBolo); // Add new
+                message = `**צו מעצר/BOLO חדש נוצר:**\nסוג: ${type}, נושא: ${subject}\nהונפק ע"י: ${issuedBy}\nתאריך: ${issueDate}`;
+            }
+
+            renderBolosWarrants();
+            boloFormContainer.classList.add('hidden');
+
+            await sendDiscordMessage(WEBHOOK_URLS.bolosWarrants, message, 'מערכת צווי מעצר & Bolos');
+        });
+
+        boloWarrantListDiv.addEventListener('click', async function(event) {
+            if (event.target.closest('.edit-bolo')) {
+                const boloId = event.target.closest('button').dataset.id;
+                const boloToEdit = bolosWarrants.find(b => b.id === boloId);
+                if (boloToEdit) {
+                    document.getElementById('boloId').value = boloToEdit.id;
+                    document.getElementById('boloType').value = boloToEdit.type;
+                    document.getElementById('boloSubject').value = boloToEdit.subject;
+                    document.getElementById('boloDescription').value = boloToEdit.description;
+                    document.getElementById('boloIssuedBy').value = boloToEdit.issuedBy;
+                    boloFormContainer.classList.remove('hidden');
+                }
+            } else if (event.target.closest('.delete-bolo')) {
+                const boloId = event.target.closest('button').dataset.id;
+                if (confirm('האם אתה בטוח שברצונך למחוק פריט זה?')) {
+                    const deletedBolo = bolosWarrants.splice(bolosWarrants.findIndex(b => b.id === boloId), 1)[0];
+                    renderBolosWarrants();
+                    const message = `**צו מעצר/BOLO נמחק:**\nסוג: ${deletedBolo.type}, נושא: ${deletedBolo.subject}\nהונפק ע"י: ${deletedBolo.issuedBy}`;
+                    await sendDiscordMessage(WEBHOOK_URLS.bolosWarrants, message, 'מערכת צווי מעצר & Bolos');
+                }
+            }
+        });
+
+        renderBolosWarrants();
+
+
+        // --- Vehicles Section Logic ---
+        const vehicles = []; // In-memory storage
+        const vehicleGrid = document.getElementById('vehicleGrid');
+        const addVehicleBtn = document.getElementById('addVehicleBtn');
+
+        function renderVehicles() {
+            vehicleGrid.innerHTML = '';
+            if (vehicles.length === 0) {
+                vehicleGrid.innerHTML = '<p style="text-align: center; color: var(--secondary-text-color);">אין כלי רכב זמינים.</p>';
+                return;
+            }
+            vehicles.forEach(vehicle => {
+                const card = document.createElement('div');
+                card.classList.add('card-item');
+                card.innerHTML = `
+                    <div class="default-icon"><i class="fas fa-car"></i></div>
+                    <strong>${vehicle.make} ${vehicle.model}</strong>
+                    <span>לוחית רישוי: ${vehicle.licensePlate}</span>
+                    <span>צבע: ${vehicle.color}</span>
+                    <span>בעלים: ${vehicle.owner}</span>
+                    <div class="actions-cell">
+                        <button class="action-button edit-vehicle" data-id="${vehicle.id}" title="ערוך"><i class="fas fa-edit"></i></button>
+                        <button class="action-button delete-vehicle" data-id="${vehicle.id}" title="מחק"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                `;
+                vehicleGrid.appendChild(card);
+            });
+        }
+
+        addVehicleBtn.addEventListener('click', async () => {
+            const licensePlate = prompt('הכנס מספר לוחית רישוי:');
+            if (licensePlate) {
+                const make = prompt('הכנס יצרן רכב:');
+                const model = prompt('הכנס דגם רכב:');
+                const color = prompt('הכנס צבע רכב:');
+                const owner = prompt('הכנס שם הבעלים:');
+
+                const newVehicle = {
+                    id: `vehicle-${Date.now()}`,
+                    licensePlate,
+                    make: make || 'לא ידוע',
+                    model: model || 'לא ידוע',
+                    color: color || 'לא ידוע',
+                    owner: owner || 'לא ידוע'
+                };
+                vehicles.push(newVehicle);
+                renderVehicles();
+
+                const message = `**רכב חדש נוסף:**\nלוחית רישוי: ${newVehicle.licensePlate}\nדגם: ${newVehicle.make} ${newVehicle.model}\nצבע: ${newVehicle.color}\nבעלים: ${newVehicle.owner}`;
+                await sendDiscordMessage(WEBHOOK_URLS.vehicles, message, 'מערכת כלי רכב');
+            }
+        });
+
+        vehicleGrid.addEventListener('click', async function(event) {
+            if (event.target.closest('.edit-vehicle')) {
+                const vehicleId = event.target.closest('button').dataset.id;
+                const vehicleToEdit = vehicles.find(v => v.id === vehicleId);
+                if (vehicleToEdit) {
+                    const updatedLicensePlate = prompt('ערוך לוחית רישוי:', vehicleToEdit.licensePlate);
+                    const updatedMake = prompt('ערוך יצרן:', vehicleToEdit.make);
+                    const updatedModel = prompt('ערוך דגם:', vehicleToEdit.model);
+                    const updatedColor = prompt('ערוך צבע:', vehicleToEdit.color);
+                    const updatedOwner = prompt('ערוך בעלים:', vehicleToEdit.owner);
+
+                    if (updatedLicensePlate !== null && updatedMake !== null && updatedModel !== null && updatedColor !== null && updatedOwner !== null) {
+                        vehicleToEdit.licensePlate = updatedLicensePlate;
+                        vehicleToEdit.make = updatedMake;
+                        vehicleToEdit.model = updatedModel;
+                        vehicleToEdit.color = updatedColor;
+                        vehicleToEdit.owner = updatedOwner;
+                        renderVehicles();
+
+                        const message = `**רכב עודכן:**\nלוחית רישוי: ${vehicleToEdit.licensePlate}\nדגם: ${vehicleToEdit.make} ${vehicleToEdit.model}\nבעלים: ${vehicleToEdit.owner}`;
+                        await sendDiscordMessage(WEBHOOK_URLS.vehicles, message, 'מערכת כלי רכב');
+                    }
+                }
+            } else if (event.target.closest('.delete-vehicle')) {
+                const vehicleId = event.target.closest('button').dataset.id;
+                if (confirm('האם אתה בטוח שברצונך למחוק רכב זה?')) {
+                    const deletedVehicle = vehicles.splice(vehicles.findIndex(v => v.id === vehicleId), 1)[0];
+                    renderVehicles();
+                    const message = `**רכב נמחק:**\nלוחית רישוי: ${deletedVehicle.licensePlate}\nדגם: ${deletedVehicle.make} ${deletedVehicle.model}\nבעלים: ${deletedVehicle.owner}`;
+                    await sendDiscordMessage(WEBHOOK_URLS.vehicles, message, 'מערכת כלי רכב');
+                }
+            }
+        });
+
+        renderVehicles();
+
+
+        // --- Evidence Section Logic ---
+        const evidenceItems = []; // In-memory storage
+        const evidenceTableBody = document.querySelector('#evidenceTable tbody');
+        const addEvidenceBtn = document.getElementById('addEvidenceBtn');
+
+        function renderEvidence() {
+            evidenceTableBody.innerHTML = '';
+            if (evidenceItems.length === 0) {
+                evidenceTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--secondary-text-color);">אין ראיות זמינות.</td></tr>';
+                return;
+            }
+            evidenceItems.forEach((item, index) => {
+                const row = evidenceTableBody.insertRow();
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${item.item}</td>
+                    <td>${item.description}</td>
+                    <td>${item.caseNumber}</td>
+                    <td>${item.collectedDate}</td>
+                    <td>${item.collectedBy}</td>
+                    <td class="actions-cell">
+                        <button class="action-button edit-evidence" data-id="${item.id}" title="ערוך"><i class="fas fa-edit"></i></button>
+                        <button class="action-button delete-evidence" data-id="${item.id}" title="מחק"><i class="fas fa-trash-alt"></i></button>
+                    </td>
+                `;
+            });
+        }
+
+        addEvidenceBtn.addEventListener('click', async () => {
+            const item = prompt('הכנס שם ראיה (פריט):');
+            if (item) {
+                const description = prompt('הכנס תיאור ראיה:');
+                const caseNumber = prompt('הכנס מספר קייס:');
+                const collectedBy = prompt('הכנס שם האוסף:');
+                const collectedDate = new Date().toLocaleDateString('he-IL');
+
+                const newEvidence = {
+                    id: `evidence-${Date.now()}`,
+                    item,
+                    description: description || 'אין תיאור',
+                    caseNumber: caseNumber || 'לא ידוע',
+                    collectedDate,
+                    collectedBy: collectedBy || 'לא ידוע'
+                };
+                evidenceItems.push(newEvidence);
+                renderEvidence();
+
+                const message = `**ראיה חדשה נוספה:**\nפריט: ${newEvidence.item}\nקייס: ${newEvidence.caseNumber}\nנאסף ע"י: ${newEvidence.collectedBy}`;
+                await sendDiscordMessage(WEBHOOK_URLS.evidence, message, 'מערכת ראיות');
+            }
+        });
+
+        evidenceTableBody.addEventListener('click', async function(event) {
+            if (event.target.closest('.edit-evidence')) {
+                const evidenceId = event.target.closest('button').dataset.id;
+                const evidenceToEdit = evidenceItems.find(e => e.id === evidenceId);
+                if (evidenceToEdit) {
+                    const updatedItem = prompt('ערוך פריט:', evidenceToEdit.item);
+                    const updatedDescription = prompt('ערוך תיאור:', evidenceToEdit.description);
+                    const updatedCaseNumber = prompt('ערוך מספר קייס:', evidenceToEdit.caseNumber);
+                    const updatedCollectedBy = prompt('ערוך נאסף ע"י:', evidenceToEdit.collectedBy);
+
+                    if (updatedItem !== null && updatedDescription !== null && updatedCaseNumber !== null && updatedCollectedBy !== null) {
+                        evidenceToEdit.item = updatedItem;
+                        evidenceToEdit.description = updatedDescription;
+                        evidenceToEdit.caseNumber = updatedCaseNumber;
+                        evidenceToEdit.collectedBy = updatedCollectedBy;
+                        renderEvidence();
+
+                        const message = `**ראיה עודכנה:**\nפריט: ${evidenceToEdit.item}\nקייס: ${evidenceToEdit.caseNumber}\nעודכן ע"י: ${evidenceToEdit.collectedBy}`;
+                        await sendDiscordMessage(WEBHOOK_URLS.evidence, message, 'מערכת ראיות');
+                    }
+                }
+            } else if (event.target.closest('.delete-evidence')) {
+                const evidenceId = event.target.closest('button').dataset.id;
+                if (confirm('האם אתה בטוח שברצונך למחוק ראיה זו?')) {
+                    const deletedEvidence = evidenceItems.splice(evidenceItems.findIndex(e => e.id === evidenceId), 1)[0];
+                    renderEvidence();
+                    const message = `**ראיה נמחקה:**\nפריט: ${deletedEvidence.item}\nקייס: ${deletedEvidence.caseNumber}`;
+                    await sendDiscordMessage(WEBHOOK_URLS.evidence, message, 'מערכת ראיות');
+                }
+            }
+        });
+
+        renderEvidence();
+
+
+        // --- Weapon Registry Section Logic ---
+        const weapons = []; // In-memory storage
+        const weaponTableBody = document.querySelector('#weaponTable tbody');
+        const addWeaponBtn = document.getElementById('addWeaponBtn');
+
+        function renderWeapons() {
+            weaponTableBody.innerHTML = '';
+            if (weapons.length === 0) {
+                weaponTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--secondary-text-color);">אין כלי נשק רשומים.</td></tr>';
+                return;
+            }
+            weapons.forEach((weapon, index) => {
+                const row = weaponTableBody.insertRow();
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${weapon.model}</td>
+                    <td>${weapon.type}</td>
+                    <td>${weapon.serialNumber}</td>
+                    <td>${weapon.owner}</td>
+                    <td>${weapon.status}</td>
+                    <td class="actions-cell">
+                        <button class="action-button edit-weapon" data-id="${weapon.id}" title="ערוך"><i class="fas fa-edit"></i></button>
+                        <button class="action-button delete-weapon" data-id="${weapon.id}" title="מחק"><i class="fas fa-trash-alt"></i></button>
+                    </td>
+                `;
+            });
+        }
+
+        addWeaponBtn.addEventListener('click', async () => {
+            const model = prompt('הכנס דגם נשק:');
+            if (model) {
+                const type = prompt('הכנס סוג נשק (לדוגמה: אקדח, רובה):');
+                const serialNumber = prompt('הכנס מספר סידורי:');
+                const owner = prompt('הכנס שם הבעלים:');
+                const status = prompt('הכנס סטטוס (לדוגמה: פעיל, תפוס):');
+
+                const newWeapon = {
+                    id: `weapon-${Date.now()}`,
+                    model,
+                    type: type || 'לא ידוע',
+                    serialNumber: serialNumber || 'לא ידוע',
+                    owner: owner || 'לא ידוע',
+                    status: status || 'פעיל'
+                };
+                weapons.push(newWeapon);
+                renderWeapons();
+
+                // Send Discord message for new weapon
+                const message = `**נשק חדש נוסף לרישום:**\nדגם: ${newWeapon.model}, סוג: ${newWeapon.type}\nמספר סידורי: ${newWeapon.serialNumber}\nבעלים: ${newWeapon.owner}, סטטוס: ${newWeapon.status}`;
+                await sendDiscordMessage(WEBHOOK_URLS.weaponRegistry, message, 'מערכת רישום נשק');
+            }
+        });
+
+        weaponTableBody.addEventListener('click', async function(event) {
+            if (event.target.closest('.edit-weapon')) {
+                const weaponId = event.target.closest('button').dataset.id;
+                const weaponToEdit = weapons.find(w => w.id === weaponId);
+                if (weaponToEdit) {
+                    const updatedModel = prompt('ערוך דגם:', weaponToEdit.model);
+                    const updatedType = prompt('ערוך סוג:', weaponToEdit.type);
+                    const updatedSerialNumber = prompt('ערוך מספר סידורי:', weaponToEdit.serialNumber);
+                    const updatedOwner = prompt('ערוך בעלים:', weaponToEdit.owner);
+                    const updatedStatus = prompt('ערוך סטטוס:', weaponToEdit.status);
+
+                    if (updatedModel !== null && updatedType !== null && updatedSerialNumber !== null && updatedOwner !== null && updatedStatus !== null) {
+                        weaponToEdit.model = updatedModel;
+                        weaponToEdit.type = updatedType;
+                        weaponToEdit.serialNumber = updatedSerialNumber;
+                        weaponToEdit.owner = updatedOwner;
+                        weaponToEdit.status = updatedStatus;
+                        renderWeapons();
+
+                        // Send Discord message for updated weapon
+                        const message = `**נשק עודכן:**\nדגם: ${weaponToEdit.model}\nמספר סידורי: ${weaponToEdit.serialNumber}\nבעלים: ${weaponToEdit.owner}\nסטטוס: ${weaponToEdit.status}`;
+                        await sendDiscordMessage(WEBHOOK_URLS.weaponRegistry, message, 'מערכת רישום נשק');
+                    }
+                }
+            } else if (event.target.closest('.delete-weapon')) {
+                const weaponId = event.target.closest('button').dataset.id;
+                if (confirm('האם אתה בטוח שברצונך למחוק נשק זה מהרישום?')) {
+                    const deletedWeapon = weapons.splice(weapons.findIndex(w => w.id === weaponId), 1)[0];
+                    renderWeapons();
+                    // Send Discord message for deleted weapon
+                    const message = `**נשק נמחק מרישום:**\nדגם: ${deletedWeapon.model}, מספר סידורי: ${deletedWeapon.serialNumber}`;
+                    await sendDiscordMessage(WEBHOOK_URLS.weaponRegistry, message, 'מערכת רישום נשק');
+                }
+            }
+        });
+
+        renderWeapons();
+
+
+        // --- Staff Section Logic ---
+        const staffMembers = []; // In-memory storage
+        const staffGrid = document.getElementById('staffGrid');
+        const addStaffBtn = document.getElementById('addStaffBtn');
+
+        function renderStaff() {
+            staffGrid.innerHTML = '';
+            if (staffMembers.length === 0) {
+                staffGrid.innerHTML = '<p style="text-align: center; color: var(--secondary-text-color);">אין אנשי צוות זמינים.</p>';
+                return;
+            }
+            staffMembers.forEach(member => {
+                const card = document.createElement('div');
+                card.classList.add('card-item');
+                card.innerHTML = `
+                    <div class="default-icon"><i class="fas fa-user-tie"></i></div>
+                    <strong>${member.name}</strong>
+                    <span>דרגה: ${member.rank}</span>
+                    <span>מזהה: ${member.idNumber}</span>
+                    <div class="actions-cell">
+                        <button class="action-button edit-staff" data-id="${member.id}" title="ערוך"><i class="fas fa-edit"></i></button>
+                        <button class="action-button delete-staff" data-id="${member.id}" title="מחק"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                `;
+                staffGrid.appendChild(card);
+            });
+        }
+
+        addStaffBtn.addEventListener('click', async () => {
+            const name = prompt('הכנס שם מלא של איש הצוות:');
+            if (name) {
+                const rank = prompt('הכנס דרגה:');
+                const idNumber = prompt('הכנס מזהה (לדוגמה: תעודת זהות / מספר עובד):');
+
+                const newStaff = {
+                    id: `staff-${Date.now()}`,
+                    name,
+                    rank: rank || 'לא ידוע',
+                    idNumber: idNumber || 'לא ידוע'
+                };
+                staffMembers.push(newStaff);
+                renderStaff();
+
+                const message = `**איש צוות חדש נוסף:**\nשם: ${newStaff.name}\nדרגה: ${newStaff.rank}\nמזהה: ${newStaff.idNumber}`;
+                await sendDiscordMessage(WEBHOOK_URLS.staff, message, 'מערכת צוות');
+            }
+        });
+
+        staffGrid.addEventListener('click', async function(event) {
+            if (event.target.closest('.edit-staff')) {
+                const staffId = event.target.closest('button').dataset.id;
+                const staffToEdit = staffMembers.find(s => s.id === staffId);
+                if (staffToEdit) {
+                    const updatedName = prompt('ערוך שם מלא:', staffToEdit.name);
+                    const updatedRank = prompt('ערוך דרגה:', staffToEdit.rank);
+                    const updatedIdNumber = prompt('ערוך מזהה:', staffToEdit.idNumber);
+
+                    if (updatedName !== null && updatedRank !== null && updatedIdNumber !== null) {
+                        staffToEdit.name = updatedName;
+                        staffToEdit.rank = updatedRank;
+                        staffToEdit.idNumber = updatedIdNumber;
+                        renderStaff();
+
+                        const message = `**איש צוות עודכן:**\nשם: ${staffToEdit.name}\nדרגה: ${staffToEdit.rank}\nמזהה: ${staffToEdit.idNumber}`;
+                        await sendDiscordMessage(WEBHOOK_URLS.staff, message, 'מערכת צוות');
+                    }
+                }
+            } else if (event.target.closest('.delete-staff')) {
+                const staffId = event.target.closest('button').dataset.id;
+                if (confirm('האם אתה בטוח שברצונך למחוק איש צוות זה?')) {
+                    const deletedStaff = staffMembers.splice(staffMembers.findIndex(s => s.id === staffId), 1)[0];
+                    renderStaff();
+                    const message = `**איש צוות נמחק:**\nשם: ${deletedStaff.name}\nדרגה: ${deletedStaff.rank}`;
+                    await sendDiscordMessage(WEBHOOK_URLS.staff, message, 'מערכת צוות');
+                }
+            }
+        });
+
+        renderStaff();
+
+
+        // --- Roster Section Logic ---
+        const rosterEntries = []; // In-memory storage
+        const rosterTableBody = document.querySelector('#rosterTable tbody');
+        const addRosterEntryBtn = document.getElementById('addRosterEntryBtn');
+
+        function renderRoster() {
+            rosterTableBody.innerHTML = '';
+            if (rosterEntries.length === 0) {
+                rosterTableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--secondary-text-color);">אין רישומי רוסטר זמינים.</td></tr>';
+                return;
+            }
+            rosterEntries.forEach((entry, index) => {
+                const row = rosterTableBody.insertRow();
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${entry.stateId}</td>
+                    <td>${entry.fullName}</td>
+                    <td>${entry.department}</td>
+                    <td>${entry.rank}</td>
+                    <td>${entry.status}</td>
+                    <td>${entry.onDutyTime}</td>
+                    <td class="actions-cell">
+                        <button class="action-button edit-roster" data-id="${entry.id}" title="ערוך"><i class="fas fa-edit"></i></button>
+                        <button class="action-button delete-roster" data-id="${entry.id}" title="מחק"><i class="fas fa-trash-alt"></i></button>
+                    </td>
+                `;
+            });
+        }
+
+        addRosterEntryBtn.addEventListener('click', async () => {
+            const fullName = prompt('הכנס שם מלא:');
+            if (fullName) {
+                const stateId = prompt('הכנס מזהה מדינה:');
+                const department = prompt('הכנס מחלקה:');
+                const rank = prompt('הכנס דרגה:');
+                const status = prompt('הכנס סטטוס (לדוגמה: Online, Offline, Away):');
+                const onDutyTime = prompt('הכנס זמן במשמרת (לדוגמה: 03:30):');
+
+                const newEntry = {
+                    id: `roster-${Date.now()}`,
+                    stateId: stateId || 'N/A',
+                    fullName,
+                    department: department || 'כללי',
+                    rank: rank || 'שוטר',
+                    status: status || 'לא מוגדר',
+                    onDutyTime: onDutyTime || '00:00'
+                };
+                rosterEntries.push(newEntry);
+                renderRoster();
+
+                // Send Discord message for new roster entry
+                const message = `**התווסף לרוסטר:**\nשם: ${newEntry.fullName}\nמחלקה: ${newEntry.department}, דרגה: ${newEntry.rank}\nסטטוס: ${newEntry.status}, זמן במשמרת: ${newEntry.onDutyTime}`;
+                await sendDiscordMessage(WEBHOOK_URLS.roster, message, 'מערכת רוסטר');
+            }
+        });
+
+        rosterTableBody.addEventListener('click', async function(event) {
+            if (event.target.closest('.edit-roster')) {
+                const entryId = event.target.closest('button').dataset.id;
+                const entryToEdit = rosterEntries.find(e => e.id === entryId);
+                if (entryToEdit) {
+                    const updatedFullName = prompt('ערוך שם מלא:', entryToEdit.fullName);
+                    const updatedStateId = prompt('ערוך מזהה מדינה:', entryToEdit.stateId);
+                    const updatedDepartment = prompt('ערוך מחלקה:', entryToEdit.department);
+                    const updatedRank = prompt('ערוך דרגה:', entryToEdit.rank);
+                    const updatedStatus = prompt('ערוך סטטוס:', entryToEdit.status);
+                    const updatedOnDutyTime = prompt('ערוך זמן במשמרת:', entryToEdit.onDutyTime);
+
+                    if (updatedFullName !== null && updatedStateId !== null && updatedDepartment !== null && updatedRank !== null && updatedStatus !== null && updatedOnDutyTime !== null) {
+                        entryToEdit.fullName = updatedFullName;
+                        entryToEdit.stateId = updatedStateId;
+                        entryToEdit.department = updatedDepartment;
+                        entryToEdit.rank = updatedRank;
+                        entryToEdit.status = updatedStatus;
+                        entryToEdit.onDutyTime = updatedOnDutyTime;
+                        renderRoster();
+
+                        // Send Discord message for updated roster entry
+                        const message = `**רשומת רוסטר עודכנה:**\nשם: ${entryToEdit.fullName}\nמחלקה: ${entryToEdit.department}, סטטוס: ${entryToEdit.status}`;
+                        await sendDiscordMessage(WEBHOOK_URLS.roster, message, 'מערכת רוסטר');
+                    }
+                }
+            } else if (event.target.closest('.delete-roster')) {
+                const entryId = event.target.closest('button').dataset.id;
+                if (confirm('האם אתה בטוח שברצונך למחוק רשומה זו מהרוסטר?')) {
+                    const deletedEntry = rosterEntries.splice(rosterEntries.findIndex(e => e.id === entryId), 1)[0];
+                    renderRoster();
+                    // Send Discord message for deleted roster entry
+                    const message = `**רשומת רוסטר נמחקה:**\nשם: ${deletedEntry.fullName}\nמחלקה: ${deletedEntry.department}`;
+                    await sendDiscordMessage(WEBHOOK_URLS.roster, message, 'מערכת רוסטר');
+                }
+            }
+        });
+
+        renderRoster();
+
+
+        // --- 10 Codes & Commands Section Logic ---
+        const codesCommands = []; // In-memory storage
+        const codesCommandsTableBody = document.querySelector('#codesCommandsTable tbody');
+        const addCodeCommandBtn = document.getElementById('addCodeCommandBtn');
+
+        function renderCodesCommands() {
+            codesCommandsTableBody.innerHTML = '';
+            if (codesCommands.length === 0) {
+                codesCommandsTableBody.innerHTML = '<tr><td colspan="3" style="text-align: center; color: var(--secondary-text-color);">אין קודים או פקודות זמינים.</td></tr>';
+                return;
+            }
+            codesCommands.forEach(item => {
+                const row = codesCommandsTableBody.insertRow();
+                row.innerHTML = `
+                    <td>${item.code}</td>
+                    <td>${item.description}</td>
+                    <td class="actions-cell">
+                        <button class="action-button edit-code-command" data-id="${item.id}" title="ערוך"><i class="fas fa-edit"></i></button>
+                        <button class="action-button delete-code-command" data-id="${item.id}" title="מחק"><i class="fas fa-trash-alt"></i></button>
+                    </td>
+                `;
+            });
+        }
+
+        addCodeCommandBtn.addEventListener('click', async () => {
+            const code = prompt('הכנס קוד (לדוגמה: 10-1):');
+            if (code) {
+                const description = prompt('הכנס תיאור עבור הקוד/פקודה:');
+
+                const newCodeCommand = {
+                    id: `code-${Date.now()}`,
+                    code,
+                    description: description || 'אין תיאור'
+                };
+                codesCommands.push(newCodeCommand);
+                renderCodesCommands();
+
+                const message = `**קוד/פקודה חדש נוסף:**\nקוד: ${newCodeCommand.code}\nתיאור: ${newCodeCommand.description}`;
+                await sendDiscordMessage(WEBHOOK_URLS.codesCommands, message, 'מערכת קודים & פקודות');
+            }
+        });
+
+        codesCommandsTableBody.addEventListener('click', async function(event) {
+            if (event.target.closest('.edit-code-command')) {
+                const codeId = event.target.closest('button').dataset.id;
+                const codeToEdit = codesCommands.find(c => c.id === codeId);
+                if (codeToEdit) {
+                    const updatedCode = prompt('ערוך קוד:', codeToEdit.code);
+                    const updatedDescription = prompt('ערוך תיאור:', codeToEdit.description);
+
+                    if (updatedCode !== null && updatedDescription !== null) {
+                        codeToEdit.code = updatedCode;
+                        codeToEdit.description = updatedDescription;
+                        renderCodesCommands();
+
+                        const message = `**קוד/פקודה עודכן:**\nקוד: ${codeToEdit.code}\nתיאור: ${codeToEdit.description}`;
+                        await sendDiscordMessage(WEBHOOK_URLS.codesCommands, message, 'מערכת קודים & פקודות');
+                    }
+                }
+            } else if (event.target.closest('.delete-code-command')) {
+                const codeId = event.target.closest('button').dataset.id;
+                if (confirm('האם אתה בטוח שברצונך למחוק קוד/פקודה זו?')) {
+                    const deletedCode = codesCommands.splice(codesCommands.findIndex(c => c.id === codeId), 1)[0];
+                    renderCodesCommands();
+                    const message = `**קוד/פקודה נמחקה:**\nקוד: ${deletedCode.code}\nתיאור: ${deletedCode.description}`;
+                    await sendDiscordMessage(WEBHOOK_URLS.codesCommands, message, 'מערכת קודים & פקודות');
+                }
+            }
+        });
+
+        renderCodesCommands();
+
+        // --- Citizens Section Logic (Basic example with Discord webhook) ---
+        // Assuming you'd add a form/table for citizens similar to others
+        const addCitizenBtn = document.getElementById('addCitizenBtn');
+        addCitizenBtn.addEventListener('click', async () => {
+            const citizenName = prompt('הכנס שם אזרח חדש:');
+            if (citizenName) {
+                const citizenID = prompt('הכנס מספר ת"ז/מזהה:');
+                const message = `**אזרח חדש נוסף:**\nשם: ${citizenName}\nמזהה: ${citizenID || 'לא צוין'}`;
+                await sendDiscordMessage(WEBHOOK_URLS.citizens, message, 'מערכת אזרחים');
+                alert(`אזרח ${citizenName} נוסף (הודעה לדיסקורד נשלחה).`);
+                // Add actual logic to save citizen data and render
+            }
+        });
+
+        // --- Initial Load ---
+        // Simulate initial active section
+        document.addEventListener('DOMContentLoaded', () => {
+            const initialSectionId = document.querySelector('.sidebar-nav li.active a').dataset.section + '-section';
+            const initialSectionTitle = document.querySelector('.sidebar-nav li.active a').textContent.trim();
+            showSection(initialSectionId);
+            updateMainHeaderTitle(initialSectionTitle);
+        });
+
+    </script>
 </body>
 </html>
