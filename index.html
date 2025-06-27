@@ -1,118 +1,266 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>טאבלט משטרה</title>
-  <style>
-    * {
-      box-sizing: border-box;
-      font-family: 'Heebo', sans-serif;
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>טאבלט משטרתי</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Heebo&display=swap');
+  * {
+    box-sizing: border-box;
+    font-family: 'Heebo', sans-serif;
+  }
+  body {
+    margin: 0;
+    background: #0a0a0a;
+    color: #eee;
+    direction: rtl;
+    user-select: none;
+    height: 100vh;
+    overflow: hidden;
+  }
+  .tablet {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    background: linear-gradient(145deg, #121212, #181818);
+    box-shadow: inset 0 0 100px #000;
+  }
+  .sidebar {
+    width: 280px;
+    background: #1f1f1f;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 15px;
+    box-shadow: inset -3px 0 5px #000;
+  }
+  .sidebar .logo {
+    background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Israel_Police_Force_Logo.svg/120px-Israel_Police_Force_Logo.svg.png') no-repeat center;
+    background-size: contain;
+    height: 90px;
+    margin-bottom: 15px;
+  }
+  .sidebar h1 {
+    color: #0af;
+    margin: 0 0 15px;
+    text-align: center;
+    font-weight: 700;
+    letter-spacing: 2px;
+  }
+  .btn {
+    background: #2b2b2b;
+    border: none;
+    padding: 14px 20px;
+    border-radius: 8px;
+    color: #ccc;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: background 0.3s, color 0.3s;
+    box-shadow: inset 0 0 8px #000000aa;
+  }
+  .btn svg {
+    width: 24px;
+    height: 24px;
+    fill: #ccc;
+    flex-shrink: 0;
+  }
+  .btn:hover {
+    background: #0a6cff;
+    color: white;
+    box-shadow: 0 0 15px #0a6cffcc;
+  }
+  .btn.active {
+    background: #0a6cff;
+    color: white;
+    box-shadow: 0 0 15px #0a6cffcc;
+  }
+  .content {
+    flex: 1;
+    padding: 40px 50px;
+    background: #121212;
+    overflow-y: auto;
+    position: relative;
+  }
+  .screen {
+    display: none;
+    animation: fadeIn 0.35s ease forwards;
+  }
+  .screen.active {
+    display: block;
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
     }
-    body {
-      margin: 0;
-      background-color: #121212;
-      color: white;
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
-    .tablet {
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-    }
-    .sidebar {
-      width: 250px;
-      background-color: #1e1e1e;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      box-shadow: inset -1px 0 0 #333;
-    }
-    .sidebar h1 {
-      margin: 0;
-      font-size: 24px;
-      text-align: center;
-      color: #0af;
-    }
-    .sidebar button {
-      background-color: #2a2a2a;
-      color: white;
-      border: none;
-      padding: 12px;
-      text-align: right;
-      font-size: 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    .sidebar button:hover {
-      background-color: #0a6cff;
-    }
-    .content {
-      flex: 1;
-      padding: 40px;
-      background-color: #181818;
-      transition: all 0.3s ease-in-out;
-    }
-    .screen {
-      display: none;
-      animation: fadeIn 0.3s ease-in-out;
-    }
-    .screen.active {
-      display: block;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    .logo {
-      background: url('https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Israel_Police_Force_Logo.svg/120px-Israel_Police_Force_Logo.svg.png') no-repeat center;
-      background-size: contain;
-      height: 80px;
-      margin-bottom: 10px;
-    }
-  </style>
+  }
+  h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-weight: 700;
+    color: #0af;
+    border-bottom: 2px solid #0af;
+    padding-bottom: 6px;
+  }
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  input[type=text], textarea {
+    width: 100%;
+    background: #222;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 12px;
+    color: #eee;
+    font-size: 15px;
+    resize: vertical;
+    margin-bottom: 20px;
+    box-shadow: inset 0 0 5px #000;
+  }
+  textarea {
+    min-height: 100px;
+  }
+  button.submit-btn {
+    background: #0a6cff;
+    border: none;
+    color: white;
+    padding: 12px 25px;
+    font-weight: 700;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    box-shadow: 0 0 12px #0a6cffaa;
+    transition: background 0.3s;
+  }
+  button.submit-btn:hover {
+    background: #0059cc;
+  }
+  p {
+    font-size: 16px;
+    line-height: 1.5;
+    color: #bbb;
+  }
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #1a1a1a;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #0a6cffaa;
+    border-radius: 10px;
+  }
+</style>
 </head>
 <body>
-  <div class="tablet">
-    <div class="sidebar">
-      <div class="logo"></div>
-      <h1>משטרה</h1>
-      <button onclick="showScreen('home')">עמוד ראשי</button>
-      <button onclick="showScreen('chase')">רדיפה</button>
-      <button onclick="showScreen('backup')">בקשופ</button>
-      <button onclick="showScreen('search')">בדיקת רישום</button>
-      <button onclick="showScreen('report')">טופס דיווח</button>
-    </div>
-    <div class="content">
-      <div id="home" class="screen active">
-        <h2>עמוד ראשי</h2>
-        <p>ברוכים הבאה להשתמש פעולות.</p>
-      </div>
-      <div id="chase" class="screen">
-        <h2>רדיפה</h2>
-        <p>הרא אשר הרדיפה ורשם פרטים.</p>
-      </div>
-      <div id="backup" class="screen">
-        <h2>בקשופ</h2>
-        <p>שלח גיבוי למקום.</p>
-      </div>
-      <div id="search" class="screen">
-        <h2>בדיקת רישום</h2>
-        <p>הכנס שם או מספר לבדיקה.</p>
-      </div>
-      <div id="report" class="screen">
-        <h2>טופס דיווח</h2>
-        <textarea rows="6" placeholder="כתוב כאן דוח..."></textarea>
-        <button>שלח דוח</button>
-      </div>
-    </div>
-  </div>
-  <script>
-    function showScreen(id) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-    }
-  </script>
+<div class="tablet">
+  <nav class="sidebar" aria-label="תפריט ניווט">
+    <div class="logo" role="img" aria-label="לוגו משטרת ישראל"></div>
+    <h1>משטרה</h1>
+    <button class="btn active" data-screen="home" aria-pressed="true" aria-label="עמוד ראשי - רישום">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10A10.011 10.011 0 0 0 12 2zm0 18a7.968 7.968 0 0 1-5.293-1.707l11.586-11.586A7.968 7.968 0 0 1 20 12a7.968 7.968 0 0 1-8 8z"/></svg>
+      רישום
+    </button>
+    <button class="btn" data-screen="chase" aria-pressed="false" aria-label="רדיפה">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 13h-2v-2h-4v2H6v-2H4v6h16z"/></svg>
+      רדיפה
+    </button>
+    <button class="btn" data-screen="backup" aria-pressed="false" aria-label="בקשת גיבוי">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7v6a5 5 0 0 0 10 0V9a7 7 0 0 0-3-7z"/></svg>
+      בקשה לגיבוי
+    </button>
+    <button class="btn" data-screen="search" aria-pressed="false" aria-label="בדיקת רישום">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 2a9 9 0 1 0 9 9 9.01 9.01 0 0 0-9-9zm0 14a5 5 0 1 1 5-5 5 5 0 0 1-5 5z"/></svg>
+      בדיקת רישום
+    </button>
+    <button class="btn" data-screen="report" aria-pressed="false" aria-label="טופס דיווח">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-7 14h-2v-2h2zm0-4h-2V7h2z"/></svg>
+      טופס דיווח
+    </button>
+  </nav>
+  <main class="content" role="main">
+    <section id="home" class="screen active" tabindex="0" aria-label="עמוד רישום">
+      <h2>רישום</h2>
+      <p>ברוכים הבאים לעמוד הרישום. כאן ניתן להזין פרטים ראשוניים.</p>
+      <label for="name">שם שוטר</label>
+      <input type="text" id="name" placeholder="הכנס שם שוטר" autocomplete="off" />
+      <label for="unit">יחידה</label>
+      <input type="text" id="unit" placeholder="הכנס שם יחידה" autocomplete="off" />
+      <button class="submit-btn" onclick="alert('פרטים נשמרו!')">שמור פרטים</button>
+    </section>
+
+    <section id="chase" class="screen" tabindex="0" aria-label="עמוד רדיפה">
+      <h2>רדיפה</h2>
+      <p>הזן פרטים אודות הרדיפה הנוכחית.</p>
+      <label for="suspect">שם החשוד</label>
+      <input type="text" id="suspect" placeholder="הכנס שם חשוד" autocomplete="off" />
+      <label for="vehicle">רכב מעורב</label>
+      <input type="text" id="vehicle" placeholder="מספר רכב או תיאור" autocomplete="off" />
+      <button class="submit-btn" onclick="alert('פרטי הרדיפה נשמרו!')">שמור פרטים</button>
+    </section>
+
+    <section id="backup" class="screen" tabindex="0" aria-label="עמוד בקשת גיבוי">
+      <h2>בקשה לגיבוי</h2>
+      <p>בקש גיבוי ליחידתך עם פרטים מפורטים.</p>
+      <label for="location">מיקום</label>
+      <input type="text" id="location" placeholder="הכנס מיקום" autocomplete="off" />
+      <label for="reason">סיבת הגיבוי</label>
+      <textarea id="reason" placeholder="הכנס סיבה" ></textarea>
+      <button class="submit-btn" onclick="alert('בקשת הגיבוי נשלחה!')">שלח בקשה</button>
+    </section>
+
+    <section id="search" class="screen" tabindex="0" aria-label="עמוד בדיקת רישום">
+      <h2>בדיקת רישום</h2>
+      <p>חפש מידע על שוטרים או חשודים.</p>
+      <label for="searchInput">חפש לפי שם</label>
+      <input type="text" id="searchInput" placeholder="הכנס שם לחיפוש" autocomplete="off" />
+      <button class="submit-btn" onclick="alert('החיפוש בוצע!')">בצע חיפוש</button>
+    </section>
+
+    <section id="report" class="screen" tabindex="0" aria-label="עמוד טופס דיווח">
+      <h2>טופס דיווח</h2>
+      <p>מלא את הפרטים למטה לשליחת דוח.</p>
+      <label for="reportDesc">תיאור הדוח</label>
+      <textarea id="reportDesc" placeholder="הכנס תיאור דוח" ></textarea>
+      <button class="submit-btn" onclick="alert('הדוח נשלח!')">שלח דוח</button>
+    </section>
+  </main>
+</div>
+
+<script>
+  const buttons = document.querySelectorAll('.btn');
+  const screens = document.querySelectorAll('.screen');
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      // הסרת מחלקת active מכל הכפתורים
+      buttons.forEach(b => {
+        b.classList.remove('active');
+        b.setAttribute('aria-pressed', 'false');
+      });
+      // הוספת active לכפתור שנלחץ
+      btn.classList.add('active');
+      btn.setAttribute('aria-pressed', 'true');
+
+      // הצגת המסך המתאים
+      const screenId = btn.getAttribute('data-screen');
+      screens.forEach(screen => {
+        screen.classList.toggle('active', screen.id === screenId);
+      });
+    });
+  });
+</script>
 </body>
 </html>
