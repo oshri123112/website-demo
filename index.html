@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>טאבלט משטרתי</title>
+<title>טאבלט משטרתי עם Firebase</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Heebo&display=swap');
   * {
@@ -198,7 +198,7 @@
       <input type="text" id="name" placeholder="הכנס שם שוטר" autocomplete="off" />
       <label for="unit">יחידה</label>
       <input type="text" id="unit" placeholder="הכנס שם יחידה" autocomplete="off" />
-      <button class="submit-btn" onclick="alert('פרטים נשמרו!')">שמור פרטים</button>
+      <button class="submit-btn" onclick="saveRegistration()">שמור פרטים</button>
     </section>
 
     <section id="chase" class="screen" tabindex="0" aria-label="עמוד רדיפה">
@@ -208,7 +208,7 @@
       <input type="text" id="suspect" placeholder="הכנס שם חשוד" autocomplete="off" />
       <label for="vehicle">רכב מעורב</label>
       <input type="text" id="vehicle" placeholder="מספר רכב או תיאור" autocomplete="off" />
-      <button class="submit-btn" onclick="alert('פרטי הרדיפה נשמרו!')">שמור פרטים</button>
+      <button class="submit-btn" onclick="saveChase()">שמור פרטים</button>
     </section>
 
     <section id="backup" class="screen" tabindex="0" aria-label="עמוד בקשת גיבוי">
@@ -218,7 +218,7 @@
       <input type="text" id="location" placeholder="הכנס מיקום" autocomplete="off" />
       <label for="reason">סיבת הגיבוי</label>
       <textarea id="reason" placeholder="הכנס סיבה" ></textarea>
-      <button class="submit-btn" onclick="alert('בקשת הגיבוי נשלחה!')">שלח בקשה</button>
+      <button class="submit-btn" onclick="saveBackup()">שלח בקשה</button>
     </section>
 
     <section id="search" class="screen" tabindex="0" aria-label="עמוד בדיקת רישום">
@@ -226,7 +226,7 @@
       <p>חפש מידע על שוטרים או חשודים.</p>
       <label for="searchInput">חפש לפי שם</label>
       <input type="text" id="searchInput" placeholder="הכנס שם לחיפוש" autocomplete="off" />
-      <button class="submit-btn" onclick="alert('החיפוש בוצע!')">בצע חיפוש</button>
+      <button class="submit-btn" onclick="saveSearch()">בצע חיפוש</button>
     </section>
 
     <section id="report" class="screen" tabindex="0" aria-label="עמוד טופס דיווח">
@@ -234,33 +234,139 @@
       <p>מלא את הפרטים למטה לשליחת דוח.</p>
       <label for="reportDesc">תיאור הדוח</label>
       <textarea id="reportDesc" placeholder="הכנס תיאור דוח" ></textarea>
-      <button class="submit-btn" onclick="alert('הדוח נשלח!')">שלח דוח</button>
+      <button class="submit-btn" onclick="saveReport()">שלח דוח</button>
     </section>
   </main>
 </div>
 
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
 <script>
+  // Firebase configuration שלך
+  const firebaseConfig = {
+    apiKey: "AIzaSyAAADd1lL5cgTgTxQOC8VSrjLlIsDlRyIk",
+    authDomain: "policereportsystem-f23fd.firebaseapp.com",
+    projectId: "policereportsystem-f23fd",
+    storageBucket: "policereportsystem-f23fd.firebasestorage.app",
+    messagingSenderId: "93022201022",
+    appId: "1:93022201022:web:b33be966dcac2ce8612aef",
+    measurementId: "G-312TDJBX4T"
+  };
+
+  // אתחל Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
   const buttons = document.querySelectorAll('.btn');
   const screens = document.querySelectorAll('.screen');
 
   buttons.forEach(btn => {
     btn.addEventListener('click', () => {
-      // הסרת מחלקת active מכל הכפתורים
       buttons.forEach(b => {
         b.classList.remove('active');
         b.setAttribute('aria-pressed', 'false');
       });
-      // הוספת active לכפתור שנלחץ
       btn.classList.add('active');
       btn.setAttribute('aria-pressed', 'true');
 
-      // הצגת המסך המתאים
       const screenId = btn.getAttribute('data-screen');
       screens.forEach(screen => {
         screen.classList.toggle('active', screen.id === screenId);
       });
     });
   });
+
+  // פונקציות שמירת נתונים ל-Firestore:
+  async function saveRegistration() {
+    const name = document.getElementById('name').value.trim();
+    const unit = document.getElementById('unit').value.trim();
+    if (!name || !unit) return alert('אנא מלא את כל השדות ברישום');
+
+    try {
+      await db.collection('registration').add({
+        name,
+        unit,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      alert('פרטי הרישום נשמרו בהצלחה!');
+      document.getElementById('name').value = '';
+      document.getElementById('unit').value = '';
+    } catch (e) {
+      alert('שגיאה בשמירת הרישום: ' + e.message);
+    }
+  }
+
+  async function saveChase() {
+    const suspect = document.getElementById('suspect').value.trim();
+    const vehicle = document.getElementById('vehicle').value.trim();
+    if (!suspect || !vehicle) return alert('אנא מלא את כל השדות ברדיפה');
+
+    try {
+      await db.collection('chases').add({
+        suspect,
+        vehicle,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      alert('פרטי הרדיפה נשמרו בהצלחה!');
+      document.getElementById('suspect').value = '';
+      document.getElementById('vehicle').value = '';
+    } catch (e) {
+      alert('שגיאה בשמירת הרדיפה: ' + e.message);
+    }
+  }
+
+  async function saveBackup() {
+    const location = document.getElementById('location').value.trim();
+    const reason = document.getElementById('reason').value.trim();
+    if (!location || !reason) return alert('אנא מלא את כל השדות בבקשת הגיבוי');
+
+    try {
+      await db.collection('backups').add({
+        location,
+        reason,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      alert('בקשת הגיבוי נשלחה בהצלחה!');
+      document.getElementById('location').value = '';
+      document.getElementById('reason').value = '';
+    } catch (e) {
+      alert('שגיאה בשליחת בקשת הגיבוי: ' + e.message);
+    }
+  }
+
+  async function saveSearch() {
+    const query = document.getElementById('searchInput').value.trim();
+    if (!query) return alert('אנא הכנס שם לחיפוש');
+
+    try {
+      await db.collection('searches').add({
+        query,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      alert('חיפוש נשמר!');
+      document.getElementById('searchInput').value = '';
+    } catch (e) {
+      alert('שגיאה בשמירת החיפוש: ' + e.message);
+    }
+  }
+
+  async function saveReport() {
+    const desc = document.getElementById('reportDesc').value.trim();
+    if (!desc) return alert('אנא מלא תיאור דוח');
+
+    try {
+      await db.collection('reports').add({
+        description: desc,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      alert('הדוח נשלח בהצלחה!');
+      document.getElementById('reportDesc').value = '';
+    } catch (e) {
+      alert('שגיאה בשליחת הדוח: ' + e.message);
+    }
+  }
 </script>
 </body>
 </html>
