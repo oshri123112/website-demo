@@ -1,1 +1,104 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>טאבלט משטרתי</title>
+<link rel="stylesheet" href="styles.css" />
+<!-- ספריית אייקונים Lucide -->
+<script src="https://unpkg.com/lucide@latest/dist/lucide.js"></script>
+</head>
+<body>
+  <div id="loginScreen" class="screen active">
+    <div class="login-box">
+      <h2>התחברות למערכת</h2>
+      <input type="text" id="usernameInput" placeholder="שם משתמש" />
+      <input type="password" id="passwordInput" placeholder="סיסמה" />
+      <button id="loginBtn">התחבר</button>
+      <p id="loginError" class="error-msg"></p>
+    </div>
+  </div>
 
+  <div id="tabletScreen" class="screen">
+    <header>
+      <div class="logo">משטרת ישראל</div>
+      <div class="user-profile">
+        <lucide-icon data-name="user" class="icon"></lucide-icon>
+        <span id="loggedInUser"></span>
+      </div>
+    </header>
+
+    <nav>
+      <button data-target="registration" class="nav-btn active" title="רישום">
+        <lucide-icon data-name="user-plus" class="icon"></lucide-icon>
+      </button>
+      <button data-target="chase" class="nav-btn" title="רדיפה">
+        <lucide-icon data-name="zap" class="icon"></lucide-icon>
+      </button>
+      <button data-target="backup" class="nav-btn" title="גיבוי">
+        <lucide-icon data-name="users" class="icon"></lucide-icon>
+      </button>
+      <button data-target="search" class="nav-btn" title="בדיקה">
+        <lucide-icon data-name="search" class="icon"></lucide-icon>
+      </button>
+      <button data-target="report" class="nav-btn" title="דוח">
+        <lucide-icon data-name="file-text" class="icon"></lucide-icon>
+      </button>
+    </nav>
+
+    <main>
+      <section id="registration" class="tab active">
+        <h2>רישום שוטרים</h2>
+        <form id="registrationForm">
+          <input type="text" name="name" placeholder="שם מלא" required />
+          <input type="text" name="unit" placeholder="יחידה" required />
+          <button type="submit">שלח רישום</button>
+        </form>
+        <div class="list-container" id="registrationList"></div>
+      </section>
+
+      <section id="chase" class="tab">
+        <h2>דיווח רדיפה</h2>
+        <form id="chaseForm">
+          <input type="text" name="suspect" placeholder="שם החשוד" required />
+          <input type="text" name="vehicle" placeholder="רכב החשוד" required />
+          <button type="submit">דווח על רדיפה</button>
+        </form>
+        <div class="list-container" id="chaseList"></div>
+      </section>
+
+      <section id="backup" class="tab">
+        <h2>בקשת גיבוי</h2>
+        <form id="backupForm">
+          <input type="text" name="location" placeholder="מיקום" required />
+          <input type="text" name="reason" placeholder="סיבה" required />
+          <button type="submit">בקש גיבוי</button>
+        </form>
+        <div class="list-container" id="backupList"></div>
+      </section>
+
+      <section id="search" class="tab">
+        <h2>בדיקת רשומות</h2>
+        <form id="searchForm">
+          <input type="text" name="query" placeholder="מה לבדוק?" required />
+          <button type="submit">בדוק</button>
+        </form>
+        <div class="list-container" id="searchList"></div>
+      </section>
+
+      <section id="report" class="tab">
+        <h2>דוח משטרתי</h2>
+        <form id="reportForm">
+          <textarea name="description" placeholder="פרטי הדוח" required></textarea>
+          <button type="submit">שלח דוח</button>
+        </form>
+        <div class="list-container" id="reportList"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
