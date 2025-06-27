@@ -11,7 +11,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
     <style>
-        /* CSS Variables for Themes (עודכן והורחב) */
+        /* CSS Variables for Themes */
         :root {
             /* Default Dark Mode */
             --bg-color: #1a1a2e;
@@ -24,7 +24,7 @@
             --input-bg: #16213e;
             --button-bg: #e94560;
             --button-hover-bg: #c93450;
-            --form-bg: #16213e; /* רקע טופס */
+            --form-bg: #16213e;
         }
 
         /* Blue Theme */
@@ -86,11 +86,11 @@
             height: 100vh;
             background-color: var(--bg-color);
             color: var(--text-color);
-            flex-direction: row; /* Flex direction for sidebar and main content */
-            overflow: hidden; /* Prevent body scroll, sections will scroll */
+            flex-direction: row;
+            overflow: hidden;
         }
 
-        /* Login Container (חדש) */
+        /* Login Container */
         #login-container {
             display: flex;
             justify-content: center;
@@ -153,9 +153,9 @@
             font-weight: bold;
         }
 
-        /* Main Container (עכשיו מוסתר בהתחלה) */
+        /* Main Container */
         #main-container {
-            display: none; /* מוסתר עד לאחר התחברות */
+            display: none; /* Hidden until login */
             flex: 1;
             display: flex;
         }
@@ -167,7 +167,7 @@
             display: flex;
             flex-direction: column;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-            z-index: 1; /* Ensure sidebar is above main content for shadow */
+            z-index: 1;
         }
 
         .sidebar-header {
@@ -182,7 +182,7 @@
 
         .sidebar-nav ul {
             list-style: none;
-            flex-grow: 1; /* Allow nav to take available space */
+            flex-grow: 1;
         }
 
         .sidebar-nav li {
@@ -213,7 +213,7 @@
         .main-content {
             flex-grow: 1;
             padding: 30px;
-            overflow-y: auto; /* Enable scrolling for main content */
+            overflow-y: auto;
             position: relative;
             background-color: var(--bg-color);
         }
@@ -228,7 +228,7 @@
             position: sticky;
             top: 0;
             background-color: var(--bg-color);
-            z-index: 10; /* Ensure header stays on top */
+            z-index: 10;
         }
 
         .main-header h2 {
@@ -254,8 +254,8 @@
 
         /* Section Styles */
         .section-content {
-            display: none; /* Hidden by default */
-            padding-top: 20px; /* Space for sticky header */
+            display: none;
+            padding-top: 20px;
         }
 
         .section-content.active {
@@ -276,7 +276,7 @@
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             position: relative;
-            word-wrap: break-word; /* Ensure text wraps within card */
+            word-wrap: break-word;
         }
 
         .card h3 {
@@ -331,7 +331,7 @@
         .form-section input[type="number"],
         .form-section textarea,
         .form-section select {
-            width: calc(100% - 20px); /* Adjust for padding */
+            width: calc(100% - 20px);
             padding: 10px;
             margin-bottom: 15px;
             border: 1px solid var(--border-color);
@@ -394,12 +394,12 @@
         .text-right { text-align: right; }
         .hidden { display: none !important; }
 
-        /* Theme Selector (חדש) */
+        /* Theme Selector */
         .theme-selector {
             padding: 15px;
             border-top: 1px solid var(--border-color);
             text-align: center;
-            margin-top: auto; /* Pushes to the bottom of sidebar */
+            margin-top: auto;
         }
 
         .theme-selector label {
@@ -450,7 +450,8 @@
                     <li><a href="#" data-section="settings"><i class="fas fa-cog"></i> הגדרות</a></li>
                 </ul>
             </nav>
-            <div class="theme-selector"> <label for="theme-select">בחר ערכת נושא:</label>
+            <div class="theme-selector">
+                <label for="theme-select">בחר ערכת נושא:</label>
                 <select id="theme-select">
                     <option value="dark">כהה (ברירת מחדל)</option>
                     <option value="blue">כחול</option>
@@ -568,14 +569,15 @@
     </div>
 
     <script>
-        // Firebase Configuration (החלף בפרטי הפרויקט שלך)
+        // Firebase Configuration (כאן הוכנסו הפרטים ששלחת)
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyAAADd1lL5cgTgTxQOC8VSrjLlIsDlRyIk",
+            authDomain: "policereportsystem-f23fd.firebaseapp.com",
+            projectId: "policereportsystem-f23fd",
+            storageBucket: "policereportsystem-f23fd.firebasestorage.app",
+            messagingSenderId: "93022201022",
+            appId: "1:93022201022:web:b33be966dcac2ce8612aef",
+            measurementId: "G-312TDJBX4T" // זה אופציונלי, הוספתי אותו כפי ששלחת
         };
 
         // Initialize Firebase
@@ -583,7 +585,7 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Firebase Collections (חדש)
+        // Firebase Collections
         const tasksCollection = db.collection('tasks');
         const codesCommandsCollection = db.collection('codesCommands');
         const citizensCollection = db.collection('citizens');
@@ -606,15 +608,15 @@
         // Theme Selector
         const themeSelect = document.getElementById('theme-select');
 
-        // Webhook URL (Managed by Firebase now)
+        // Webhook URLS (Managed by Firebase now)
         let WEBHOOK_URLS = {
-            general: '', // Will be loaded from Firebase
+            general: '',
             tasks: '',
             codesCommands: '',
             citizens: ''
         };
 
-        // --- Authentication Logic (חדש) ---
+        // --- Authentication Logic ---
         auth.onAuthStateChanged(user => {
             if (user) {
                 // User is signed in
@@ -673,15 +675,15 @@
             }
         });
 
-        // --- Theme Switching Logic (חדש) ---
+        // --- Theme Switching Logic ---
         function applyTheme(theme) {
             document.body.setAttribute('data-theme', theme);
-            localStorage.setItem('selectedTheme', theme); // Save user preference
-            themeSelect.value = theme; // Update dropdown
+            localStorage.setItem('selectedTheme', theme);
+            themeSelect.value = theme;
         }
 
         function applySavedTheme() {
-            const savedTheme = localStorage.getItem('selectedTheme') || 'dark'; // Default to dark
+            const savedTheme = localStorage.getItem('selectedTheme') || 'dark';
             applyTheme(savedTheme);
         }
 
@@ -689,7 +691,7 @@
             applyTheme(e.target.value);
         });
 
-        // --- Webhook Settings (עכשיו מנוהל ב-Firebase Firestore) ---
+        // --- Webhook Settings (Managed by Firebase Firestore) ---
         const webhookUrlInput = document.getElementById('webhook-url');
         const saveWebhookBtn = document.getElementById('save-webhook-btn');
 
@@ -711,7 +713,7 @@
         saveWebhookBtn.addEventListener('click', async () => {
             const generalUrl = webhookUrlInput.value;
             WEBHOOK_URLS.general = generalUrl;
-            WEBHOOK_URLS.tasks = generalUrl; // Apply general to others for simplicity
+            WEBHOOK_URLS.tasks = generalUrl;
             WEBHOOK_URLS.codesCommands = generalUrl;
             WEBHOOK_URLS.citizens = generalUrl;
 
@@ -725,7 +727,7 @@
             }
         });
 
-        // --- Discord Webhook Function (ללא שינוי מהותי, משתמש ב-WEBHOOK_URLS) ---
+        // --- Discord Webhook Function ---
         async function sendDiscordMessage(webhookUrl, message, sourceName) {
             if (!webhookUrl) {
                 console.warn(`Webhook URL for ${sourceName} is not configured.`);
@@ -766,15 +768,7 @@
         }
 
         function updateActionButtons(sectionId) {
-            currentActionButtons.innerHTML = ''; // Clear existing buttons
-            if (sectionId === 'tasks-section') {
-                // No specific action buttons needed for tasks, as the add button is in the form
-            } else if (sectionId === 'codes-commands-section') {
-                // No specific action buttons needed
-            } else if (sectionId === 'citizens-section') {
-                // No specific action buttons needed
-            }
-            // Add more conditions for other sections if needed
+            currentActionButtons.innerHTML = '';
         }
 
         sidebarNavLinks.forEach(link => {
@@ -791,7 +785,7 @@
             });
         });
 
-        // --- Firebase Data Management and Rendering (עודכן ל-Firestore) ---
+        // --- Firebase Data Management and Rendering ---
 
         // Tasks
         const tasksList = document.getElementById('tasks-list');
@@ -800,7 +794,7 @@
         const taskDescriptionInput = document.getElementById('task-description');
 
         async function renderTasks() {
-            tasksList.innerHTML = ''; // Clear current list
+            tasksList.innerHTML = '';
             try {
                 const snapshot = await tasksCollection.orderBy('createdAt', 'desc').get();
                 if (snapshot.empty) {
@@ -844,7 +838,7 @@
                     alert(`משימה "${title}" נוספה בהצלחה.`);
                     taskTitleInput.value = '';
                     taskDescriptionInput.value = '';
-                    renderTasks(); // Re-render tasks after adding
+                    renderTasks();
                 } catch (error) {
                     console.error('Error adding task:', error);
                     alert('שגיאה בהוספת משימה.');
@@ -858,9 +852,6 @@
             try {
                 await tasksCollection.doc(taskId).update({ completed: true });
                 alert('המשימה סומנה כבוצעה.');
-                // Optional: Send Discord message for completion
-                // const task = (await tasksCollection.doc(taskId).get()).data();
-                // await sendDiscordMessage(WEBHOOK_URLS.tasks, `**משימה בוצעה:** ${task.title}`, 'מערכת משימות');
                 renderTasks();
             } catch (error) {
                 console.error('Error marking task completed:', error);
@@ -875,7 +866,7 @@
                     const message = `**משימה נמחקה:** ${taskTitle}`;
                     await sendDiscordMessage(WEBHOOK_URLS.tasks, message, 'מערכת משימות');
                     alert(`משימה "${taskTitle}" נמחקה.`);
-                    renderTasks(); // Re-render tasks after deletion
+                    renderTasks();
                 } catch (error) {
                     console.error('Error deleting task:', error);
                     alert('שגיאה במחיקת משימה.');
@@ -890,7 +881,7 @@
         const codeValueInput = document.getElementById('code-value');
 
         async function renderCodesCommands() {
-            codesCommandsList.innerHTML = ''; // Clear current list
+            codesCommandsList.innerHTML = '';
             try {
                 const snapshot = await codesCommandsCollection.orderBy('createdAt', 'desc').get();
                 if (snapshot.empty) {
@@ -965,7 +956,7 @@
         const citizenIdInput = document.getElementById('citizen-id');
 
         async function renderCitizens() {
-            citizensList.innerHTML = ''; // Clear current list
+            citizensList.innerHTML = '';
             try {
                 const snapshot = await citizensCollection.orderBy('createdAt', 'desc').get();
                 if (snapshot.empty) {
@@ -1058,12 +1049,9 @@
             } else if (initialSectionId === 'citizens-section') {
                 renderCitizens();
             }
-            // Add more sections here if they need initial data loading
         }
 
-        // Listen for changes in sections to re-render data (if Firebase data is updated externally)
-        // Note: For real-time updates, you would use .onSnapshot()
-        // For simplicity and to match previous behavior, manual re-render on section switch
+        // Listen for changes in sections to re-render data
         document.querySelectorAll('.sidebar-nav a').forEach(link => {
             link.addEventListener('click', () => {
                 const sectionId = link.dataset.section + '-section';
@@ -1076,9 +1064,6 @@
                 }
             });
         });
-
-        // Initialize settings and theme on page load (before auth check completes)
-        // applySavedTheme(); // This is now called after auth.onAuthStateChanged completes
     </script>
 </body>
 </html>
